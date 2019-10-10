@@ -3,40 +3,34 @@ import os
 import random
 
 import discord
-from dotenv import load_dotenv
+from discord.ext import commands
 
-load_dotenv()
-token = os.getenv('DISCORD_TOKEN')
+client = commands.Bot(command_prefix='.')
 
-client = discord.Client()
 
 @client.event
 async def on_ready():
-    print(f'{client.user.name} has connected to Discord!')
+    print("Bot is ready")
 
 @client.event
 async def on_member_join(member):
-    await member.create_dm()
-    await member.dm_channel.send(
-        f'Hi {member.name}, welcome to my Discord server!'
-    )
+    print(f'{member} has joined a server')
 
 @client.event
-async def on_message(message):
-    if message.author == client.user:
-        return
+async def on_member_remove(member):
+    print(f'{member} has left a server')
 
-    brooklyn_99_quotes = [
-        'I\'m the human form of the 💯 emoji.',
-        'Bingpot!',
-        (
-            'Cool. Cool cool cool cool cool cool cool, '
-            'no doubt no doubt no doubt no doubt.'
-        ),
-    ]
+@client.command()
+async def ping(ctx):
+    await ctx.send(f'Pong! {round(client.latency * 1000)}ms')
 
-    if message.content == '99!':
-        response = random.choice(brooklyn_99_quotes)
-        await message.channel.send(response)
+@client.command(aliases=['8ball'])
+async def _8ball(ctx, *, question):
+    responses = ['It is certain.',
+                 'It is decidedly so.',
+                 'Yes.',
+                 'Ask again later.',
+                 'My sources say no.']
+    await ctx.send(f'Question: {question}\nAnswer: {random.choice(responses)}')
 
-client.run(token)
+client.run('NjI0MTg1MzgyMjM3MzcyNDIx.XZ8A-Q._bIKDzENFXvlOPnxOBKw9FOJgJE')
