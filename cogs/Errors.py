@@ -1,5 +1,4 @@
 # This cog handles all the errors that occur.
-import discord
 from discord.ext import commands
 from cogs.Example import Example
 
@@ -8,6 +7,10 @@ class Errors(commands.Cog):
 
     def __init__(self, client):
         self.client = client
+
+    @commands.Cog.listener()
+    async def on_ready(self):
+        print("Errors cog is ready")
 
     # If any error happens it sends it to this function which either sends a message back to the user or displays
     # the error in the console.
@@ -21,7 +24,7 @@ class Errors(commands.Cog):
                            f' commands please type __**.help**__ ')
         # Any other error not specified. Raises the command in console.
         else:
-            print(error)
+            print(f'Error: {error}')
 
     # Errors for clear command
     @Example.clear.error
@@ -78,6 +81,7 @@ class Errors(commands.Cog):
             print(f'Error: kick- BadArgument')
             await ctx.send(f'Either the member is not banned, or the name of the user you entered is not correct, '
                            f'make sure you specify a user that is banned and that you entered the right name.')
+
 
 
 def setup(client):
