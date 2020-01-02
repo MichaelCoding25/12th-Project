@@ -1,5 +1,7 @@
 from discord.ext import commands, tasks
 from members_info import MembersInfo
+from datetime import time
+import sqlite3
 
 
 class InfoReceive(commands.Cog):
@@ -10,20 +12,75 @@ class InfoReceive(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        self.get_members.start()
+        self.get_members_list.start()
+        self.get_members_db.start()
         print("Info_Receive cog is ready")
 
-    @tasks.loop(seconds=5)
-    async def get_members(self):
+    @tasks.loop(seconds=10)
+    async def get_members_list(self):
         guilds = self.client.guilds
         all_members = []
         for guild in guilds:
             for member in guild.members:
                 member_name = f'{member.name}#{member.discriminator}'
-                new_member = MembersInfo(member_name, member.guild, member.status, member.activity)
+                new_member = MembersInfo(member_name, member.status, member.activity)
                 all_members.append(new_member)
         for each_member in all_members:
             self.members_dict.setdefault(each_member.member_name, []).append(each_member)
+        print('get_member_list complete')
+
+    @tasks.loop(seconds=5)
+    async def get_members_db(self):
+        guilds = self.client.guilds
+        all_members = []
+        for guild in guilds:
+            for member in guild.members:
+                member_name = f'{member.name}#{member.discriminator}'
+                new_member = MembersInfo(member_name, member.status, member.activity)
+                all_members.append(new_member)
+        unique_members = []
+        for mem in all_members:
+            if all(map(lambda un_mem: un_mem.member_name != mem.member_name, unique_members)):
+                unique_members.append(mem)
+
+        # Enter info into database
+        conn = sqlite3.connect('members.db')
+        c = conn.cursor()
+        for u_mem in unique_members:
+            # If there are new activities, insert them into the database
+            c.execute("SELECT act_name FROM activities")
+            activities_old = c.fetchall()
+            is_in = False
+            for act in activities_old:
+                if u_mem.member_activity == act[0]:
+                    is_in = True
+                    break
+            if not is_in:
+                c.execute("INSERT INTO activities VALUES (NULL , ?)", u_mem.member_activity)
+            conn.commit()
+
+            # Takes the data from the object and inserts into database
+            c.execute("SELECT id, st_name FROM statuses")
+            statuses = c.fetchall()
+            status_id = 0
+            for status in statuses:
+                if status[1] == u_mem.member_status:
+                    status_id = status[0]
+                    break
+
+            c.execute("SELECT id, act_name FROM activities")
+            activities = c.fetchall()
+            activity_id = 0
+            for activity in activities:
+                if activity[1] == u_mem.member_activity:
+                    activity_id = activity[0]
+                    break
+
+            c.execute("INSERT INTO members_info VALUES (?, ?, ?, ?)", (u_mem.member_name, u_mem.now_time, status_id,
+                                                                       activity_id))
+            conn.commit()
+        conn.close()
+        print('get_member_db complete')
 
 
 def setup(client):

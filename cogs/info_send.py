@@ -37,7 +37,6 @@ class InfoSend(commands.Cog):
             await ctx.send(f'I am sorry but it seems that I was not able to find that `{member}`'
                            f' has ever been `{status}` in my life time')
 
-
     @commands.command()
     async def member_last_activity(self, ctx, activity, *, member):
         did_find = False

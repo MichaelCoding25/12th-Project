@@ -44,6 +44,6 @@ for filename in os.listdir('./cogs'):
         client.load_extension(f'cogs.{filename[:-3]}')
 
 
-# Start and runs the bot using the key
-client.run('')
+# Start and runs the bot using the token provided by discord
+client.run('NjI0MTg1MzgyMjM3MzcyNDIx.Xey1qA.1Qoyz2MTnEXMQs6nFajmOxdd_kY')
 
