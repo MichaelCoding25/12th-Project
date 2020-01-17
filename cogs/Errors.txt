@@ -83,6 +83,5 @@ class Errors(commands.Cog):
                            f'make sure you specify a user that is banned and that you entered the right name.')
 
 
-
 def setup(client):
     client.add_cog(Errors(client))

@@ -45,5 +45,5 @@ for filename in os.listdir('./cogs'):
 
 
 # Start and runs the bot using the token provided by discord
-client.run('')
+client.run('NjI0MTg1MzgyMjM3MzcyNDIx.XhGDuQ.YjnHl77Gxevrtx7dtoWECetf-kU')
 
