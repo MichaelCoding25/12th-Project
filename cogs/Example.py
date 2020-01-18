@@ -8,12 +8,19 @@ status = cycle(['Status 1', 'Status 2'])
 
 
 class Example(commands.Cog):
+    """
+    An example/test to see how commands and events work on the Discord API.
+    """
 
     def __init__(self, client):
         self.client = client
 
     @commands.Cog.listener()
     async def on_ready(self):
+        """
+        When the cog is ready and loaded, display text in console.
+        :return:
+        """
         print("Example cog is ready")
 
     # Events
@@ -26,21 +33,35 @@ class Example(commands.Cog):
     # Commands
     @commands.command()
     async def ping(self, ctx):
+        """
+        When client puts in ping command, write back Pong!
+        :param ctx: What server and channel did the command come from to be able to send it back to the right place.
+        :return: The text 'Pong!'
+        """
         await ctx.send('Pong!')
 
     # @tasks.loop(seconds=1)
     # async def change_status(self):
         # await self.client.change_presence(activity=discord.Game(next(status)))
 
-    # When member joins server, it writes that in terminal
     @commands.Cog.listener()
     async def on_member_join(self, member):
+        """
+        When a discord member join a server that the bot is in, it displays a message to the console.
+        :param member: The member who has joined a server.
+        :return:
+        """
         print('')
         print(f'{member} has joined a server')
 
     # When member leaves server, it writes that in terminal
     @commands.Cog.listener()
     async def on_member_remove(self, member):
+        """
+        When a discord member leaves a server that the bot is in, it displays a message to the console.
+        :param member: The member who has left a server.
+        :return:
+        """
         print('')
         print(f'{member} has left a server')
 
@@ -52,6 +73,12 @@ class Example(commands.Cog):
     # Command which lets user ask a question and then generates a random response
     @commands.command(aliases=['8ball'])
     async def _8ball(self, ctx, *, question):
+        """
+        Receives a question and writes back a random response from a list together with the question asked.
+        :param ctx: What server and channel did the command come from to be able to send it back to the right place.
+        :param question: The question that the user wants to ask the bot.
+        :return: Question + Answer.
+        """
         responses = ['It is certain.',
                      'It is decidedly so.',
                      'Yes.',
@@ -62,24 +89,51 @@ class Example(commands.Cog):
     # Command to clear chat of (X) amount of messages
     @commands.command()
     async def clear(self,  ctx, amount: int):
+        """
+        Deletes 'amount' of lines of conversation in chat the the user wrote the command in
+        together with the command request itself.
+        :param ctx: What server and channel did the command come from to be able to send it back to the right place.
+        :param amount: How many lines to delete.
+        :return:
+        """
         amount = amount + 1
         await ctx.channel.purge(limit=amount)
 
     # Command to kick users
     @commands.command()
     async def kick(self, ctx, member: discord.Member, *, reason=None):
+        """
+
+        :param ctx: What server and channel did the command come from to be able to send it back to the right place.
+        :param member: What member to kick.
+        :param reason: What reason are you kicking the member, could be null.
+        :return: Writes that said user was kicked and for what reason.
+        """
         await member.kick(reason=reason)
         await ctx.send(f'Kicked {member.mention} for {reason}')
 
     # Command to ban users
     @commands.command()
     async def ban(self, ctx, member: discord.Member, *, reason=None):
+        """
+
+        :param ctx: What server and channel did the command come from to be able to send it back to the right place.
+        :param member: What member to ban.
+        :param reason: What is the reason you are banning said member, could be null.
+        :return: Writes that said user was banned and for what reason.
+        """
         await member.ban(reason=reason)
         await ctx.send(f'Banned {member.mention} for {reason}')
 
     # Command to unban users
     @commands.command()
     async def unban(self, ctx, *, member):
+        """
+        Take said user off ban list and allow them to join back into the server.
+        :param ctx: What server and channel did the command come from to be able to send it back to the right place.
+        :param member: Who is the user we want to unban.
+        :return: Message that said user was unbanned.
+        """
         banned_users = await ctx.guild.bans()
         member_name, member_discriminator = member.split('#')
 

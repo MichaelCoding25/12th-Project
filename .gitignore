@@ -1,3 +1,7 @@
+# Batch file and databases
+start_bot.bat
+members.db
+
 # Editors
 .vscode/
 .idea/

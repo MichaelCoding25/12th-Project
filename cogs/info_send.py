@@ -3,17 +3,36 @@ from cogs.info_receive import InfoReceive
 
 
 class InfoSend(commands.Cog):
+    """
+    Sends data into the Discord channel chats.
+    """
 
     def __init__(self, client):
+        """
+        Receives and configures the Discord client for the commands.
+        :param client:
+        """
         self.client = client
 
     @commands.Cog.listener()
     async def on_ready(self):
+        """
+        Starts the cog.
+        :return:
+        """
         print("Info_Send cog is ready")
         print('')
 
     @commands.command()
     async def member_last_status(self, ctx, status, *, member):
+        """
+        Checks that the status the member input is correct and then searches for the last instance of that
+        status in the db/dictionary and sends back to the chat the time that they had that last status.
+        :param ctx: What server and channel did the command come from to be able to send it back to the right place.
+        :param status: What is the status they want to receive the answer for.
+        :param member: The member for which the command is being issued for.
+        :return: The last time said user had that particular status.
+        """
         if not status == 'online' and not status == 'idle' and not status == 'dnd' and not status == 'do_not_disturb'\
                 and not status == 'offline':
             await ctx.send(f'`{status}` is not an acceptable parameter, please try any of these for the'
@@ -39,6 +58,14 @@ class InfoSend(commands.Cog):
 
     @commands.command()
     async def member_last_activity(self, ctx, activity, *, member):
+        """
+        Searches for the last instance of that activity in the db/dictionary and sends back to the chat
+        the time that they had that last activity.
+        :param ctx: What server and channel did the command come from to be able to send it back to the right place.
+        :param activity: What is the activity they want to receive the answer for.
+        :param member: The member for which the command is being issued for.
+        :return: The last time said user was doing that particular activity.
+        """
         did_find = False
         for instance in reversed(InfoReceive.members_dict[member]):
             if instance.member_activity == f'{activity}':
@@ -51,4 +78,9 @@ class InfoSend(commands.Cog):
 
 
 def setup(client):
+    """
+    Adds current file into cog list.
+    :param client:
+    :return:
+    """
     client.add_cog(InfoSend(client))

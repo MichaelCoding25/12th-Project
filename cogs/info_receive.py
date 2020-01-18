@@ -1,23 +1,38 @@
 from discord.ext import commands, tasks
 from members_info import MembersInfo
-from datetime import time
 import sqlite3
 
 
 class InfoReceive(commands.Cog):
+    """
+    Receives info from Discord application
+    """
 
     def __init__(self, client):
+        """
+        Receives and configures the Discord client for the tasks.
+        :param client:
+        """
         self.client = client
     members_dict = dict()
 
     @commands.Cog.listener()
     async def on_ready(self):
+        """
+        Starts the cog and starts all loop and listening tasks.
+        :return:
+        """
 #       self.get_members_list.start()
         self.get_members_db.start()
         print("Info_Receive cog is ready")
 
     @tasks.loop(seconds=10)
     async def get_members_list(self):
+        """
+        Gets all member objects from all servers tha the Bot is in and inputs them into a dictionary
+        of lists with all member info.
+        :return:
+        """
         guilds = self.client.guilds
         all_members = []
         for guild in guilds:
@@ -31,6 +46,11 @@ class InfoReceive(commands.Cog):
 
     @tasks.loop(seconds=5)
     async def get_members_db(self):
+        """
+        Receives all members from all discord servers that the Bot is in every X time and
+        inputs them into the members.db database.
+        :return:
+        """
         try:
             guilds = self.client.guilds
             all_members = []
@@ -87,4 +107,9 @@ class InfoReceive(commands.Cog):
 
 
 def setup(client):
+    """
+    Adds current file into cog list.
+    :param client:
+    :return:
+    """
     client.add_cog(InfoReceive(client))
