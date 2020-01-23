@@ -1,6 +1,5 @@
-# Batch file and databases
-start_bot.bat
-members.db
+# Databases
+*.db
 
 # Editors
 .vscode/
@@ -127,3 +126,4 @@ venv.bak/
 .mypy_cache/
 .dmypy.json
 dmypy.json
+*.bat

@@ -48,14 +48,15 @@ def create_statuses_table():
                     st_name TEXT    NOT NULL
                 );         
     """)
-    c.execute("""INSERT INTO statuses (id, st_name)
-                 VALUES 
-                 (1, 'offline'),
-                 (2, 'online'),
-                 (3, 'idle'),
-                 (4, 'dnd');
-    """)
     conn.commit()
+    c.execute("SELECT id FROM statuses")
+    if len(c.fetchall()) is 0:
+        c.execute("""INSERT INTO statuses (id, st_name)
+                     VALUES 
+                     (1 , 'offline'),
+                     (2 , 'online'),
+                     (3 , 'idle'),
+                     (4 , 'dnd');
+        """)
+        conn.commit()
     conn.close()
-
-

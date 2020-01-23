@@ -1,7 +1,8 @@
 # Main bot file, starts the bot and everything else from here
 import os
-import traceback
+
 from discord.ext import commands
+
 from database_sqlite import *
 
 # The prefix of the commands that the bot uses
@@ -74,5 +75,4 @@ for filename in os.listdir('./cogs'):
 
 # The token provided by Discord Application in order to authenticate the bot (Required in order to start the
 # bot successfully).
-client.run('NjI0MTg1MzgyMjM3MzcyNDIx.XiIjUw.Tp0nItwpSCcUWNZF0RWTkkvMltw')
-
+client.run('')

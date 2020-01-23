@@ -1,5 +1,6 @@
 from discord.ext import commands
 from cogs.info_receive import InfoReceive
+import sqlite3
 
 
 class InfoSend(commands.Cog):
@@ -24,7 +25,7 @@ class InfoSend(commands.Cog):
         print('')
 
     @commands.command()
-    async def member_last_status(self, ctx, status, *, member):
+    async def member_last_status_dict(self, ctx, status, *, member):
         """
         Checks that the status the member input is correct and then searches for the last instance of that
         status in the db/dictionary and sends back to the chat the time that they had that last status.
@@ -57,7 +58,43 @@ class InfoSend(commands.Cog):
                            f' has ever been `{status}` in my life time')
 
     @commands.command()
-    async def member_last_activity(self, ctx, activity, *, member):
+    async def member_last_status_db(self, ctx, status, *, member):
+        if not status == 'online' and not status == 'idle' and not status == 'dnd' and not status == 'do_not_disturb'\
+                and not status == 'offline':
+            await ctx.send(f'`{status}` is not an acceptable parameter, please try any of these for the'
+                           f' status parameter: `online` `do_not_disturb` `idle` `offline`')
+            return
+        if status == 'do_not_disturb':
+            status = 'dnd'
+        conn = sqlite3.connect('members.db')
+        c = conn.cursor()
+        c.execute("SELECT * FROM statuses")
+        statuses = c.fetchall()
+        c.execute("SELECT * FROM members_info WHERE mem_id = ?", member)
+        instances = c.fetchall()
+
+        for stat in statuses:
+            if stat[1] == status:
+                status_id = stat[0]
+
+        for instance in reversed(instances):
+            if instance[3] == f'{status}':
+                if status == 'dnd':
+                    await ctx.send(f"`{member} was last on Do Not Disturb on {instance.now_datetime} `")
+                    return
+                else:
+                    await ctx.send(f"`{member} was last {status} on {instance.now_datetime} `")
+                    return
+
+        if status == 'dnd':
+            await ctx.send(f'I am sorry but it seems that I was not able to find that `{member}`'
+                           f' has ever been on `Do Not Disturb` in my life time')
+        else:
+            await ctx.send(f'I am sorry but it seems that I was not able to find that `{member}`'
+                           f' has ever been `{status}` in my life time')
+
+    @commands.command()
+    async def member_last_activity_dict(self, ctx, activity, *, member):
         """
         Searches for the last instance of that activity in the db/dictionary and sends back to the chat
         the time that they had that last activity.

@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from itertools import cycle
 import random
+import os
 
 
 status = cycle(['Status 1', 'Status 2'])
@@ -38,7 +39,11 @@ class Example(commands.Cog):
         :param ctx: What server and channel did the command come from to be able to send it back to the right place.
         :return: The text 'Pong!'
         """
+        f = open("picture.jpg", 'rb')
+        pic = discord.File(f)
         await ctx.send('Pong!')
+        await ctx.send(file=pic)
+        f.close()
 
     # @tasks.loop(seconds=1)
     # async def change_status(self):
@@ -131,7 +136,7 @@ class Example(commands.Cog):
         """
         Take said user off ban list and allow them to join back into the server.
         :param ctx: What server and channel did the command come from to be able to send it back to the right place.
-        :param member: Who is the user we want to unban.
+        :param member: Who is the user we want to un-ban.
         :return: Message that said user was unbanned.
         """
         banned_users = await ctx.guild.bans()
