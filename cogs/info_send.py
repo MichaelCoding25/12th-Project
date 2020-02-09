@@ -1,6 +1,8 @@
+import discord
 from discord.ext import commands
 from cogs.info_receive import InfoReceive
 import sqlite3
+import graph_creation as gc
 
 
 class InfoSend(commands.Cog):
@@ -59,8 +61,8 @@ class InfoSend(commands.Cog):
 
     @commands.command()
     async def member_last_status_db(self, ctx, status, *, member):
-        if not status == 'online' and not status == 'idle' and not status == 'dnd' and not status == 'do_not_disturb'\
-                and not status == 'offline':
+        statuses = {'online', 'idle', 'dnd', 'do not disturb', 'offline'}
+        if status not in statuses:
             await ctx.send(f'`{status}` is not an acceptable parameter, please try any of these for the'
                            f' status parameter: `online` `do_not_disturb` `idle` `offline`')
             return
@@ -70,7 +72,7 @@ class InfoSend(commands.Cog):
         c = conn.cursor()
         c.execute("SELECT * FROM statuses")
         statuses = c.fetchall()
-        c.execute("SELECT * FROM members_info WHERE mem_id = ?", member)
+        c.execute("SELECT * FROM members_info WHERE mem_id = ?", (member,))
         instances = c.fetchall()
 
         for stat in statuses:
@@ -92,6 +94,7 @@ class InfoSend(commands.Cog):
         else:
             await ctx.send(f'I am sorry but it seems that I was not able to find that `{member}`'
                            f' has ever been `{status}` in my life time')
+        c.close()
 
     @commands.command()
     async def member_last_activity_dict(self, ctx, activity, *, member):
@@ -112,6 +115,37 @@ class InfoSend(commands.Cog):
         if not did_find:
             await ctx.send(f'I am sorry but it seems that I was not able to find that `{member}` has ever done'
                            f' the `activity` you wanted to check in my life time.')
+
+    @commands.command()
+    async def get_day_statuses(self, ctx, *, member):
+        conn = sqlite3.connect('members.db')
+        c = conn.cursor()
+        c.execute("SELECT status_id FROM members_info WHERE mem_id = ? AND date_time >="
+                  " strftime('%s',datetime('now','-1 day'))", (member,))
+        day_status_ids = c.fetchall()
+
+        c.execute("SELECT * FROM statuses")
+        all_statuses_db = c.fetchall()
+        c.close()
+
+        all_day_statuses = []
+        for status_id in day_status_ids:
+            for stat in all_statuses_db:
+                if stat[0] == status_id[0]:
+                    all_day_statuses.append(stat[1])
+        print(all_day_statuses)
+
+        gc.create_status_day_graph(all_day_statuses)
+
+        img = open("status_day_graph.png", 'rb')
+        send_img = discord.File(img)
+
+        embed = discord.Embed(title="Statuses from last 24h",
+                              description="The percentages of each status of the member you requested",
+                              colour=discord.Color.orange())
+        embed.set_author(name=ctx.message.author.name, icon_url=ctx.message.author.avatar_url)
+
+        await ctx.send(file=send_img)
 
 
 def setup(client):

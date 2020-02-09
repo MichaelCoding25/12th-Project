@@ -13,7 +13,7 @@ class MembersInfo:
         """
         self.member_name = f'{member_name}'
         self.member_status = f'{member_status}'
-        if 'Custom Status' in f'{member_activity}':
+        if 'CustomActivity' in f'{type(member_activity)}':
             self.member_activity = 'Custom Status'
         elif 'playing' in f'{member_activity}':
             self.member_activity = 'Playing'

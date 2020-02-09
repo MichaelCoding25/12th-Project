@@ -77,7 +77,8 @@ class InfoReceive(commands.Cog):
                         is_in = True
                         break
                 if not is_in:
-                    c.execute("INSERT INTO activities(act_name) VALUES (?)", (str(u_mem.member_activity),))
+                    c.execute("INSERT INTO activities(id, act_name) VALUES (?, ?)", (len(activities_old) + 1,
+                                                                                     str(u_mem.member_activity),))
                 conn.commit()
 
                 # Takes the data from the object and inserts into database

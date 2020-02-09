@@ -150,6 +150,22 @@ class Example(commands.Cog):
                 await ctx.send(f'Unbanned {user.mention}')
                 return
 
+    @commands.command()
+    async def test_embed(self, ctx):
+        embead = discord.Embed(title="Title", description="Description", colour=discord.Color.red())
+
+        embead.set_author(name=self.client.user.name, icon_url=self.client.user.avatar_url)  # The member requesting
+        embead.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)  # Member info graph is based on
+        embead.set_image(url="https://discordpy.readthedocs.io/en/latest/_images/snake.png")  # The graph
+        embead.set_thumbnail(url="https://www.python.org/static/img/python-logo@2x.png")
+
+        embead.add_field(name="Field 1", value="value 1")
+        embead.add_field(name="Field 2", value="value 2")
+
+        embead.add_field(name="Field 3", value="value 3", inline=False)
+
+        await ctx.send(embed=embead)
+
 
 def setup(client):
     client.add_cog(Example(client))
