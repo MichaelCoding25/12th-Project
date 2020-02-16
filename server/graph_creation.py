@@ -29,4 +29,28 @@ def create_status_day_graph(stats_list):
     ax1.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=0)
     ax1.axis('equal')
     plt.savefig('status_day_graph.png')
+
+
+def create_status_week_graph(stats_list):
+    N = 5
+    menMeans = (20, 35, 30, 35, 27)
+    womenMeans = (25, 32, 34, 20, 25)
+
+    online = []
+    offline = []
+    idle = []
+    dnd = []
+    ind = np.arange(N)  # the x locations for the groups
+    width = 0.35  # the width of the bars: can also be len(x) sequence
+
+    p1 = plt.bar(ind, menMeans, width)
+    p2 = plt.bar(ind, womenMeans, width,
+                 bottom=menMeans)
+
+    plt.ylabel('Percentages')
+    plt.title('Statuses by Day and Percentage of Day')
+    plt.xticks(ind, ('Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5'))
+    plt.yticks(np.arange(0, 101, 10))
+    plt.legend((p1[0], p2[0]), ('Online', 'Offline'))
+
     plt.show()

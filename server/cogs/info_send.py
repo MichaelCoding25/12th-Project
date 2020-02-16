@@ -117,40 +117,70 @@ class InfoSend(commands.Cog):
                            f' the `activity` you wanted to check in my life time.')
 
     @commands.command()
-    async def get_day_statuses(self, ctx, *, member):
-        conn = sqlite3.connect('members.db')
-        c = conn.cursor()
-        c.execute("SELECT status_id FROM members_info WHERE mem_id = ? AND date_time >="
-                  " strftime('%s',datetime('now','-1 day'))", (member,))
-        day_status_ids = c.fetchall()
+    async def get_user_stats(self, ctx, stat_type, time_check, *, member):
+        return_msg = ''
+        return_img = ''
 
-        c.execute("SELECT * FROM statuses")
-        all_statuses_db = c.fetchall()
-        c.close()
+        if str(stat_type).lower() is 'status':
+            return_msg, return_img = self.get_user_statuses(ctx, time_check, member)
+
+        file_img = open("status_day_graph.png", 'rb')
+        return_img = discord.File(file_img)
+
+        ctx.send(return_msg, file=return_img)
+
+    def get_user_statuses(self, ctx, time_check, member):
+
+        if str(time_check).lower() is 'day':
+            return_message, return_img = self.get_user_statuses_day(ctx, member)
+        elif str(time_check).lower() is 'week':
+            return_message, return_img = self.get_user_statuses_week(ctx, member)
+        elif str(time_check).lower() is 'month':
+            return_message, return_img = self.get_user_statuses_month(ctx, member)
+
+        return return_message, return_img
+
+    def get_user_statuses_day(self, ctx, member):
+
+        db_conn = sqlite3.connect('members.db')
+        cursor = db_conn.cursor()
+        cursor.execute("SELECT status_id FROM members_info WHERE mem_id = ? AND date_time >="
+                       " strftime('%s',datetime('now','-1 day'))", (member,))
+        day_status_ids = cursor.fetchall()
+        cursor.execute("SELECT * FROM statuses")
+        all_statuses_db = cursor.fetchall()
+        db_conn.close()
 
         all_day_statuses = []
         for status_id in day_status_ids:
             for stat in all_statuses_db:
                 if stat[0] == status_id[0]:
                     all_day_statuses.append(stat[1])
-        print(all_day_statuses)
 
         gc.create_status_day_graph(all_day_statuses)
 
         img = open("status_day_graph.png", 'rb')
-        send_img = discord.File(img)
+        return_img = discord.File(img)
+        return_message = f"Graph of {member}'s statuses from the last 24h.\nRequested by {ctx.message.author.mention}"
 
-        embed = discord.Embed(title="Statuses from last 24h",
-                              description="The percentages of each status of the member you requested",
-                              colour=discord.Color.orange())
-        embed.set_author(name=ctx.message.author.name, icon_url=ctx.message.author.avatar_url)
+        return return_message, return_img
 
-        await ctx.send(file=send_img)
+    def get_user_statuses_week(self, ctx, member):
+        return_message = ''
+        return_img = ''
+
+        return return_message, return_img
+
+    def get_user_statuses_month(self, cxt, member):
+        return_message = ''
+        return_img = ''
+
+        return return_message, return_img
 
 
 def setup(client):
     """
-    Adds current file into cog list.
+    Adds current class into cog list.
     :param client:
     :return:
     """

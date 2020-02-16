@@ -73,6 +73,6 @@ for filename in os.listdir('./cogs'):
         client.load_extension(f'cogs.{filename[:-3]}')
 
 
-# The token provided by Discord Application in order to authenticate the bot (Required in order to start the
-# bot successfully).
+# The token provided by Discord Application in order to authenticate the bot (Required in order to connect the bot
+# to the Discord servers).
 client.run('')
