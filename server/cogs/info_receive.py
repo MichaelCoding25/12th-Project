@@ -22,7 +22,7 @@ class InfoReceive(commands.Cog):
         Starts the cog and starts all loop and listening tasks.
         :return:
         """
-#       self.get_members_list.start()
+        self.get_members_list.start()
         self.get_members_db.start()
         print("Info_Receive cog is ready")
 

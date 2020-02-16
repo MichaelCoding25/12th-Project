@@ -121,21 +121,21 @@ class InfoSend(commands.Cog):
         return_msg = ''
         return_img = ''
 
-        if str(stat_type).lower() is 'status':
+        if str(stat_type).lower() == 'status':
             return_msg, return_img = self.get_user_statuses(ctx, time_check, member)
 
         file_img = open("status_day_graph.png", 'rb')
         return_img = discord.File(file_img)
 
-        ctx.send(return_msg, file=return_img)
+        await ctx.send(return_msg, file=return_img)
 
     def get_user_statuses(self, ctx, time_check, member):
 
-        if str(time_check).lower() is 'day':
+        if str(time_check).lower() == 'day':
             return_message, return_img = self.get_user_statuses_day(ctx, member)
-        elif str(time_check).lower() is 'week':
+        elif str(time_check).lower() == 'week':
             return_message, return_img = self.get_user_statuses_week(ctx, member)
-        elif str(time_check).lower() is 'month':
+        elif str(time_check).lower() == 'month':
             return_message, return_img = self.get_user_statuses_month(ctx, member)
 
         return return_message, return_img
@@ -144,7 +144,7 @@ class InfoSend(commands.Cog):
 
         db_conn = sqlite3.connect('members.db')
         cursor = db_conn.cursor()
-        cursor.execute("SELECT status_id FROM members_info WHERE mem_id = ? AND date_time >="
+        cursor.execute("SELECT status_id FROM members_info WHERE mem_id = ? AND datetime >="
                        " strftime('%s',datetime('now','-1 day'))", (member,))
         day_status_ids = cursor.fetchall()
         cursor.execute("SELECT * FROM statuses")
