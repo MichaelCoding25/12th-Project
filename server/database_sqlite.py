@@ -11,7 +11,7 @@ def create_members_info_table():
     c = conn.cursor()
     c.execute("""CREATE TABLE IF NOT EXISTS members_info (
                     mem_id      TEXT    NOT NULL,
-                    datetime    INTEGER NOT NULL,
+                    date_time    INTEGER NOT NULL,
                     status_id   INTEGER,
                     activity_id INTEGER
                 );
@@ -50,7 +50,7 @@ def create_statuses_table():
     """)
     conn.commit()
     c.execute("SELECT id FROM statuses")
-    if len(c.fetchall()) is 0:
+    if len(c.fetchall()) == 0:
         c.execute("""INSERT INTO statuses (id, st_name)
                      VALUES 
                      (1 , 'offline'),

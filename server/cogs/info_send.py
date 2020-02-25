@@ -3,6 +3,7 @@ from discord.ext import commands
 from cogs.info_receive import InfoReceive
 import sqlite3
 import graph_creation as gc
+from datetime import datetime
 
 
 class InfoSend(commands.Cog):
@@ -117,34 +118,21 @@ class InfoSend(commands.Cog):
                            f' the `activity` you wanted to check in my life time.')
 
     @commands.command()
-    async def get_user_stats(self, ctx, stat_type, time_check, *, member):
+    async def get_user_stats(self, ctx, stat_type, num_of_days, graph_type, *, member):
         return_msg = ''
         return_img = ''
 
         if str(stat_type).lower() == 'status':
-            return_msg, return_img = self.get_user_statuses(ctx, time_check, member)
-
-        file_img = open("status_day_graph.png", 'rb')
-        return_img = discord.File(file_img)
+            return_msg, return_img = self.get_user_statuses(ctx, num_of_days, graph_type, member)
 
         await ctx.send(return_msg, file=return_img)
 
-    def get_user_statuses(self, ctx, time_check, member):
 
-        if str(time_check).lower() == 'day':
-            return_message, return_img = self.get_user_statuses_day(ctx, member)
-        elif str(time_check).lower() == 'week':
-            return_message, return_img = self.get_user_statuses_week(ctx, member)
-        elif str(time_check).lower() == 'month':
-            return_message, return_img = self.get_user_statuses_month(ctx, member)
-
-        return return_message, return_img
-
-    def get_user_statuses_day(self, ctx, member):
+    def get_user_statuses_day(self, ctx, graph_type, member):
 
         db_conn = sqlite3.connect('members.db')
         cursor = db_conn.cursor()
-        cursor.execute("SELECT status_id FROM members_info WHERE mem_id = ? AND datetime >="
+        cursor.execute("SELECT status_id FROM members_info WHERE mem_id = ? AND date_time >="
                        " strftime('%s',datetime('now','-1 day'))", (member,))
         day_status_ids = cursor.fetchall()
         cursor.execute("SELECT * FROM statuses")
@@ -157,23 +145,70 @@ class InfoSend(commands.Cog):
                 if stat[0] == status_id[0]:
                     all_day_statuses.append(stat[1])
 
-        gc.create_status_day_graph(all_day_statuses)
+        gc.create_status_pie_graph(all_day_statuses)
 
-        img = open("status_day_graph.png", 'rb')
+        img = open("status_pie_graph.png", 'rb')
         return_img = discord.File(img)
         return_message = f"Graph of {member}'s statuses from the last 24h.\nRequested by {ctx.message.author.mention}"
 
         return return_message, return_img
 
-    def get_user_statuses_week(self, ctx, member):
-        return_message = ''
-        return_img = ''
+    def get_user_statuses(self, ctx, num_of_days, graph_type, member):
 
-        return return_message, return_img
+        if graph_type == 'pie':
+            db_conn = sqlite3.connect('members.db')
+            cursor = db_conn.cursor()
+            days_string = f'-{num_of_days} days'
+            cursor.execute("SELECT status_id FROM members_info WHERE mem_id = ? AND date_time >="
+                           " strftime('%s',datetime('now',?))", (member, days_string))
+            status_ids = cursor.fetchall()
+            cursor.execute("SELECT * FROM statuses")
+            all_statuses_db = cursor.fetchall()
+            db_conn.close()
 
-    def get_user_statuses_month(self, cxt, member):
-        return_message = ''
-        return_img = ''
+            all_week_statuses = []
+            for status_id in status_ids:
+                for stat in all_statuses_db:
+                    if stat[0] == status_id[0]:
+                        all_week_statuses.append(stat[1])
+
+            gc.create_status_pie_graph(all_week_statuses)
+
+            img = open("status_pie_graph.png", 'rb')
+            return_img = discord.File(img)
+            return_message = f"Graph of {member}'s statuses from the last {num_of_days}d.\nRequested by" \
+                             f" {ctx.message.author.mention}"
+
+        elif graph_type == 'bar':
+            db_conn = sqlite3.connect('members.db')
+            cursor = db_conn.cursor()
+            days_string = f'-{num_of_days} days'
+            cursor.execute("SELECT status_id, date_time FROM members_info WHERE mem_id = ? AND date_time >="
+                           " strftime('%s',datetime('now',?))", (member, days_string))
+            statuses = cursor.fetchall()
+            cursor.execute("SELECT * FROM statuses")
+            all_statuses_db = cursor.fetchall()
+            db_conn.close()
+
+            day_week_statuses = []
+            day_in_seconds = 86400
+            now = datetime.now()
+            now_time = int(datetime.timestamp(now))
+            for day in range(int(num_of_days)):
+                day_statuses = []
+                for status in statuses:
+                    if now_time - (day_in_seconds * (day + 1)) < status[1] <= now_time - (day_in_seconds * day):
+                        for stat in all_statuses_db:
+                            if stat[0] == status[0]:
+                                day_statuses.append(stat[1])
+                day_week_statuses.append(day_statuses)
+
+            gc.create_status_bar_graph(day_week_statuses)
+
+            img = open("status_bar_graph.png", 'rb')
+            return_img = discord.File(img)
+            return_message = f"Graph of {member}'s statuses from the last {num_of_days}d per day.\nRequested by" \
+                             f" {ctx.message.author.mention}"
 
         return return_message, return_img
 
