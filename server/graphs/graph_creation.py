@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import sqlite3
 
 
 def create_status_pie_graph(stats_list):
@@ -62,20 +61,15 @@ def create_status_bar_graph(stats_list):
                 day_stats_nums[3] += 1
 
         if len(day) != 0:
-            online.append(int(day_stats_nums[0] / len(day) * 100))
-            offline.append(int(day_stats_nums[1] / len(day) * 100))
-            idle.append(int(day_stats_nums[2] / len(day) * 100))
-            dnd.append(int(day_stats_nums[3] / len(day) * 100))
+            online.append(float(day_stats_nums[0] / len(day) * 100))
+            offline.append(float(day_stats_nums[1] / len(day) * 100))
+            idle.append(float(day_stats_nums[2] / len(day) * 100))
+            dnd.append(float(day_stats_nums[3] / len(day) * 100))
         else:
             online.append(0)
             offline.append(0)
             idle.append(0)
             dnd.append(0)
-
-    print(online)
-    print(offline)
-    print(idle)
-    print(dnd)
 
     ind = np.arange(num_of_days)  # the x locations for the groups
     width = 0.35  # the width of the bars: can also be len(x) sequence
@@ -96,3 +90,30 @@ def create_status_bar_graph(stats_list):
     plt.legend((p1[0], p2[0], p3[0], p4[0]), ('Online', 'Offline', 'Idle', 'Do Not Disturb'))
 
     plt.savefig('status_bar_graph.png')
+
+
+def create_activity_pie_graph(activity_list, activities_names):
+    activity_num = len(activity_list)
+
+    ind_activity_nums = []
+
+    for activity_name in activities_names:
+        ind_activity_nums.append(0)
+    for act in activity_list:
+        for num in range(len(activities_names)):
+            if act == activities_names[num]:
+                ind_activity_nums[num] += 1
+                num = len(activities_names)
+
+    labels = []
+    labels_names = activities_names
+    sizes = []
+    for i in range(len(ind_activity_nums)):
+        if ind_activity_nums[i] > 0:
+            labels.append(labels_names[i])
+            sizes.append(int(ind_activity_nums[i] / activity_num * 100))
+
+    fig1, ax1 = plt.subplots()
+    ax1.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=0)
+    ax1.axis('equal')
+    plt.savefig('activity_pie_graph.png')

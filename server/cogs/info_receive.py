@@ -1,5 +1,5 @@
 from discord.ext import commands, tasks
-from members_info import MembersInfo
+from Server.database.members_info import MembersInfo
 import sqlite3
 
 
