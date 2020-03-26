@@ -2,6 +2,7 @@ from discord.ext import commands, tasks
 from server.database.members_info import MembersInfo
 import sqlite3
 from server.database.database_sqlite import DATABASE_DIRECTORY
+from datetime import datetime
 
 
 class InfoReceive(commands.Cog):
@@ -43,7 +44,6 @@ class InfoReceive(commands.Cog):
                 all_members.append(new_member)
         for each_member in all_members:
             self.members_dict.setdefault(each_member.member_name, []).append(each_member)
-        print('get_member_list complete')
 
     @tasks.loop(minutes=10)
     async def get_members_db(self):
@@ -103,7 +103,7 @@ class InfoReceive(commands.Cog):
                                                                            activity_id))
                 conn.commit()
             conn.close()
-            print('get_member_db complete')
+            print(f'get_member_db completed || {datetime.today().strftime("%b %d %Y %H:%M")}')
         except Exception as e:
             print(str(e))
 
