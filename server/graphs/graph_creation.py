@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from start import CURRENT_DIR as CD
 
-GRAPHS_DIRECTORY = CD + '/server/graphs/status_pie_graph.png'
+GRAPHS_DIRECTORY = CD + '/server/graphs'
 
 
 def create_status_pie_graph(stats_list):
@@ -40,7 +40,7 @@ def create_status_pie_graph(stats_list):
     fig1, ax1 = plt.subplots()
     ax1.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=0, colors=colors_list)
     ax1.axis('equal')
-    plt.savefig(GRAPHS_DIRECTORY)
+    plt.savefig(GRAPHS_DIRECTORY + '/status_pie_graph.png')
 
 
 def create_status_bar_graph(stats_list):
@@ -92,7 +92,7 @@ def create_status_bar_graph(stats_list):
     plt.yticks(np.arange(0, 101, 10))
     plt.legend((p1[0], p2[0], p3[0], p4[0]), ('Online', 'Offline', 'Idle', 'Do Not Disturb'))
 
-    plt.savefig(GRAPHS_DIRECTORY)
+    plt.savefig(GRAPHS_DIRECTORY + '/status_bar_graph.png')
 
 
 def create_activity_pie_graph(activity_list, activities_names):
@@ -119,4 +119,4 @@ def create_activity_pie_graph(activity_list, activities_names):
     fig1, ax1 = plt.subplots()
     ax1.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=0)
     ax1.axis('equal')
-    plt.savefig(GRAPHS_DIRECTORY)
+    plt.savefig(GRAPHS_DIRECTORY + 'activity_pie_graph.png')
