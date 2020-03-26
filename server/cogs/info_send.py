@@ -4,6 +4,7 @@ from server.cogs.info_receive import InfoReceive
 import sqlite3
 import server.graphs.graph_creation as gc
 from datetime import datetime
+from server.database.database_sqlite import DATABASE_DIRECTORY
 
 
 class InfoSend(commands.Cog):
@@ -49,7 +50,7 @@ class InfoSend(commands.Cog):
                    f'`online` `do_not_disturb` `idle` `offline` '
         if status == 'do_not_disturb':
             status = 'dnd'
-        conn = sqlite3.connect('members.db')
+        conn = sqlite3.connect(DATABASE_DIRECTORY)
         c = conn.cursor()
         c.execute("SELECT * FROM statuses")
         statuses = c.fetchall()
@@ -78,7 +79,7 @@ class InfoSend(commands.Cog):
                    f'my database.`'
 
     def member_last_activity(self, ctx, activity, member):
-        conn = sqlite3.connect('members.db')
+        conn = sqlite3.connect(DATABASE_DIRECTORY)
         c = conn.cursor()
         c.execute("SELECT act_name FROM activities")
         activities_tup = c.fetchall()
@@ -132,7 +133,6 @@ class InfoSend(commands.Cog):
             await ctx.send(f'I am sorry but it seems that I was not able to find that `{member}` has ever done'
                            f' the `activity` you wanted to check in my life time.')
 
-
     @commands.command()
     async def get_user_stats(self, ctx, stat_type, num_of_days, graph_type, *, member):
         return_msg = ''
@@ -150,7 +150,7 @@ class InfoSend(commands.Cog):
     def get_user_statuses(self, ctx, num_of_days, graph_type, member):
 
         if graph_type == 'pie':
-            db_conn = sqlite3.connect('members.db')
+            db_conn = sqlite3.connect(DATABASE_DIRECTORY)
             cursor = db_conn.cursor()
             days_string = f'-{num_of_days} days'
             cursor.execute("SELECT status_id FROM members_info WHERE mem_id = ? AND date_time >="
@@ -174,7 +174,7 @@ class InfoSend(commands.Cog):
                              f" {ctx.message.author.mention}"
 
         elif graph_type == 'bar':
-            db_conn = sqlite3.connect('members.db')
+            db_conn = sqlite3.connect(DATABASE_DIRECTORY)
             cursor = db_conn.cursor()
             days_string = f'-{num_of_days} days'
             cursor.execute("SELECT status_id, date_time FROM members_info WHERE mem_id = ? AND date_time >="
@@ -199,7 +199,7 @@ class InfoSend(commands.Cog):
 
             gc.create_status_bar_graph(day_week_statuses)
 
-            img = open("status_bar_graph.png", 'rb')
+            img = open("server/graphs/status_bar_graph.png", 'rb')
             return_img = discord.File(img)
             return_message = f"Graph of {member}'s statuses from the last {num_of_days}d per day.\nRequested by" \
                              f" {ctx.message.author.mention}"
@@ -209,7 +209,7 @@ class InfoSend(commands.Cog):
     def get_user_activities(self, ctx, num_of_days, graph_type, member):
 
         if graph_type == "pie":
-            db_conn = sqlite3.connect('members.db')
+            db_conn = sqlite3.connect(DATABASE_DIRECTORY)
             cursor = db_conn.cursor()
             days_string = f'-{num_of_days} days'
             cursor.execute("SELECT activity_id FROM members_info WHERE mem_id = ? AND date_time >="

@@ -1,5 +1,8 @@
 # Handles the database
 import sqlite3
+from start import CURRENT_DIR as CD
+
+DATABASE_DIRECTORY = CD + '/server/database/members.db'
 
 
 def create_members_info_table():
@@ -7,7 +10,7 @@ def create_members_info_table():
     Creates the members_info table if one does not exist in the db file and inputs all needed columns.
     :return:
     """
-    conn = sqlite3.connect('members.db')
+    conn = sqlite3.connect(DATABASE_DIRECTORY)
     c = conn.cursor()
     c.execute("""CREATE TABLE IF NOT EXISTS members_info (
                     mem_id      TEXT    NOT NULL,
@@ -25,7 +28,7 @@ def create_activities_table():
     Creates the activities table if one does not exist in the db file and inputs all needed columns.
     :return:
     """
-    conn = sqlite3.connect('members.db')
+    conn = sqlite3.connect(DATABASE_DIRECTORY)
     c = conn.cursor()
     c.execute("""CREATE TABLE IF NOT EXISTS activities (
                     id       INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -41,7 +44,7 @@ def create_statuses_table():
     Creates the statuses table if one does not exist in the db file and inputs all needed columns.
     :return:
     """
-    conn = sqlite3.connect('members.db')
+    conn = sqlite3.connect(DATABASE_DIRECTORY)
     c = conn.cursor()
     c.execute("""CREATE TABLE IF NOT EXISTS statuses (
                     id      INTEGER PRIMARY KEY AUTOINCREMENT,

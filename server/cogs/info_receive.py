@@ -1,6 +1,7 @@
 from discord.ext import commands, tasks
 from server.database.members_info import MembersInfo
 import sqlite3
+from server.database.database_sqlite import DATABASE_DIRECTORY
 
 
 class InfoReceive(commands.Cog):
@@ -65,7 +66,7 @@ class InfoReceive(commands.Cog):
                     unique_members.append(mem)
 
             # Enter info into database
-            conn = sqlite3.connect('members.db')
+            conn = sqlite3.connect(DATABASE_DIRECTORY)
             c = conn.cursor()
             for u_mem in unique_members:
                 # If there are new activities, insert them into the database

@@ -1,6 +1,7 @@
 from server import bot
-import discord
-from time import sleep
+import os
+
+CURRENT_DIR = os.getcwd().replace('\\', '/')
 
 
 def start_bot(token):
