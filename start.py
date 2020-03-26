@@ -1,4 +1,4 @@
-from Server import bot
+from server import bot
 import discord
 from time import sleep
 

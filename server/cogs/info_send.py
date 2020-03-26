@@ -1,8 +1,8 @@
 import discord
 from discord.ext import commands
-from Server.cogs.info_receive import InfoReceive
+from server.cogs.info_receive import InfoReceive
 import sqlite3
-import Server.graphs.graph_creation as gc
+import server.graphs.graph_creation as gc
 from datetime import datetime
 
 

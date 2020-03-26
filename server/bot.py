@@ -7,7 +7,7 @@ from discord.ext import commands
 
 import discord
 
-from Server.database.database_sqlite import *
+from server.database.database_sqlite import *
 
 # The prefix of the commands that the bot uses
 client = commands.Bot(command_prefix='.')
@@ -74,9 +74,9 @@ async def reload(ctx, extension):
 
 def main(token):
     # Load all the cogs from the files in the cogs folder on startup of bot.
-    for filename in os.listdir('./Server/cogs'):
+    for filename in os.listdir('./server/cogs'):
         if filename.endswith('.py'):
-            client.load_extension(f'Server.cogs.{filename[:-3]}')
+            client.load_extension(f'server.cogs.{filename[:-3]}')
 
     # The token provided by Discord Application in order to authenticate the bot (Required in order to connect the bot
     # to the Discord servers).
