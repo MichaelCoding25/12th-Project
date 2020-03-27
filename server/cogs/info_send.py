@@ -5,6 +5,7 @@ import sqlite3
 import server.graphs.graph_creation as gc
 from datetime import datetime
 from server.database.database_sqlite import DATABASE_DIRECTORY
+from server.graphs.graph_creation import GRAPHS_DIRECTORY
 
 
 class InfoSend(commands.Cog):
@@ -168,7 +169,7 @@ class InfoSend(commands.Cog):
 
             gc.create_status_pie_graph(all_statuses)
 
-            img = open("status_pie_graph.png", 'rb')
+            img = open(f"{GRAPHS_DIRECTORY}/status_pie_graph.png", 'rb')
             return_img = discord.File(img)
             return_message = f"Graph of {member}'s statuses from the last {num_of_days}d.\nRequested by" \
                              f" {ctx.message.author.mention}"
@@ -199,7 +200,7 @@ class InfoSend(commands.Cog):
 
             gc.create_status_bar_graph(day_week_statuses)
 
-            img = open("server/graphs/status_bar_graph.png", 'rb')
+            img = open(f"{GRAPHS_DIRECTORY}/status_bar_graph.png", 'rb')
             return_img = discord.File(img)
             return_message = f"Graph of {member}'s statuses from the last {num_of_days}d per day.\nRequested by" \
                              f" {ctx.message.author.mention}"
@@ -231,7 +232,7 @@ class InfoSend(commands.Cog):
 
             gc.create_status_pie_graph(all_activities, act_name_list)
 
-            img = open("activity_pie_graph.png", 'rb')
+            img = open(f"{GRAPHS_DIRECTORY}/activity_pie_graph.png", 'rb')
             return_img = discord.File(img)
             return_message = f"Graph of {member}'s activities from the last {num_of_days}d.\nRequested by" \
                              f" {ctx.message.author.mention}"
