@@ -43,7 +43,7 @@ def create_status_pie_graph(stats_list):
     plt.legend()
     plt.savefig(GRAPHS_DIRECTORY + '/status_pie_graph.png')
 
-    plt.close()
+    plt.clf()
 
 
 def create_status_bar_graph(stats_list):
@@ -98,7 +98,7 @@ def create_status_bar_graph(stats_list):
 
     plt.savefig(GRAPHS_DIRECTORY + '/status_bar_graph.png')
 
-    plt.close()
+    plt.clf()
 
 
 def create_activity_pie_graph(activity_list, activities_names):
@@ -127,4 +127,4 @@ def create_activity_pie_graph(activity_list, activities_names):
     ax1.axis('equal')
     plt.savefig(GRAPHS_DIRECTORY + 'activity_pie_graph.png')
 
-    plt.close()
+    plt.clf()

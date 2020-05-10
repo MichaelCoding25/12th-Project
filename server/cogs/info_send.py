@@ -136,8 +136,10 @@ class InfoSend(commands.Cog):
 
     @commands.command()
     async def get_user_stats(self, ctx, stat_type, num_of_days, graph_type, *, member):
+        await ctx.message.delete()
         if int(num_of_days) > 20:
-            await ctx.send("You may only request data that is 20 days old, or less. Please try again.")
+            await ctx.send(f"{ctx.message.author.mention} You may only request data that is 20 days old, or less. "
+                           f"Please try again.")
             return
         return_msg = ''
         return_img = ''
