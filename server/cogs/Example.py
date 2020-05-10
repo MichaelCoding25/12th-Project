@@ -158,6 +158,7 @@ class Example(commands.Cog):
         embead.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)  # Member info graph is based on
         embead.set_image(url="https://discordpy.readthedocs.io/en/latest/_images/snake.png")  # The graph
         embead.set_thumbnail(url="https://www.python.org/static/img/python-logo@2x.png")
+        embead.title = "Better Title"
 
         embead.add_field(name="Field 1", value="value 1")
         embead.add_field(name="Field 2", value="value 2")

@@ -136,14 +136,30 @@ class InfoSend(commands.Cog):
 
     @commands.command()
     async def get_user_stats(self, ctx, stat_type, num_of_days, graph_type, *, member):
+        if int(num_of_days) > 20:
+            await ctx.send("You may only request data that is 20 days old, or less. Please try again.")
+            return
         return_msg = ''
         return_img = ''
+        return_embed = discord.Embed(title='User Statistics Graph', colour=discord.Color.blue())
+        return_embed.timestamp = datetime.now()
+
+        # The member requesting the stats
+        return_embed.set_author(name=self.client.user.name, icon_url=self.client.user.avatar_url)
+        # The member the info of is being requested
+        return_embed.set_footer(text=ctx.author.name, icon_url=ctx.author.avatar_url)
+
+        return_embed.add_field(name='Statistic:', value=stat_type)
+        return_embed.add_field(name='Graph Type:', value=graph_type)
+        return_embed.add_field(name='Number Of Days:', value=num_of_days)
 
         if self.member_security_check(ctx, member):
             if str(stat_type).lower() == 'statuses':
                 return_msg, return_img = self.get_user_statuses(ctx, num_of_days, graph_type, member)
 
-            await ctx.send(return_msg, file=return_img)
+            return_embed.description = return_msg
+            return_embed.set_image(url=f"attachment://{return_img.filename}")
+            await ctx.send(embed=return_embed, file=return_img)
         else:
             await ctx.send(f"{member} is not currently in your server. If you would like to check his information "
                            f"please make sure he is a part of your Discord server.")
@@ -201,9 +217,10 @@ class InfoSend(commands.Cog):
             gc.create_status_bar_graph(day_week_statuses)
 
             img = open(f"{GRAPHS_DIRECTORY}/status_bar_graph.png", 'rb')
-            return_img = discord.File(img)
+            return_img = discord.File(f"{GRAPHS_DIRECTORY}/status_bar_graph.png", filename="status_bar_graph.png")
             return_message = f"Graph of {member}'s statuses from the last {num_of_days}d per day.\nRequested by" \
                              f" {ctx.message.author.mention}"
+            img.close()
 
         return return_message, return_img
 

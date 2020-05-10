@@ -13,8 +13,6 @@ from server.database.database_sqlite import *
 client = commands.Bot(command_prefix='.')
 
 
-
-
 @client.event
 async def on_ready():
     """
