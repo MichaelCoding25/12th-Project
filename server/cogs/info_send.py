@@ -4,7 +4,7 @@ from server.cogs.info_receive import InfoReceive
 import sqlite3
 import server.graphs.graph_creation as gc
 from datetime import datetime
-from server.database.database_sqlite import DATABASE_DIRECTORY
+from server.database.database_sqlite import MEMBERS_DATABASE_DIRECTORY
 from server.graphs.graph_creation import GRAPHS_DIRECTORY
 
 
