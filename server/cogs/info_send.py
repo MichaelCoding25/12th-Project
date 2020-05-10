@@ -51,7 +51,7 @@ class InfoSend(commands.Cog):
                    f'`online` `do_not_disturb` `idle` `offline` '
         if status == 'do_not_disturb':
             status = 'dnd'
-        conn = sqlite3.connect(DATABASE_DIRECTORY)
+        conn = sqlite3.connect(MEMBERS_DATABASE_DIRECTORY)
         c = conn.cursor()
         c.execute("SELECT * FROM statuses")
         statuses = c.fetchall()
@@ -80,7 +80,7 @@ class InfoSend(commands.Cog):
                    f'my database.`'
 
     def member_last_activity(self, ctx, activity, member):
-        conn = sqlite3.connect(DATABASE_DIRECTORY)
+        conn = sqlite3.connect(MEMBERS_DATABASE_DIRECTORY)
         c = conn.cursor()
         c.execute("SELECT act_name FROM activities")
         activities_tup = c.fetchall()
@@ -167,7 +167,7 @@ class InfoSend(commands.Cog):
     def get_user_statuses(self, ctx, num_of_days, graph_type, member):
 
         if graph_type == 'pie':
-            db_conn = sqlite3.connect(DATABASE_DIRECTORY)
+            db_conn = sqlite3.connect(MEMBERS_DATABASE_DIRECTORY)
             cursor = db_conn.cursor()
             days_string = f'-{num_of_days} days'
             cursor.execute("SELECT status_id FROM members_info WHERE mem_id = ? AND date_time >="
@@ -191,7 +191,7 @@ class InfoSend(commands.Cog):
                              f" {ctx.message.author.mention}"
 
         elif graph_type == 'bar':
-            db_conn = sqlite3.connect(DATABASE_DIRECTORY)
+            db_conn = sqlite3.connect(MEMBERS_DATABASE_DIRECTORY)
             cursor = db_conn.cursor()
             days_string = f'-{num_of_days} days'
             cursor.execute("SELECT status_id, date_time FROM members_info WHERE mem_id = ? AND date_time >="
@@ -227,7 +227,7 @@ class InfoSend(commands.Cog):
     def get_user_activities(self, ctx, num_of_days, graph_type, member):
 
         if graph_type == "pie":
-            db_conn = sqlite3.connect(DATABASE_DIRECTORY)
+            db_conn = sqlite3.connect(MEMBERS_DATABASE_DIRECTORY)
             cursor = db_conn.cursor()
             days_string = f'-{num_of_days} days'
             cursor.execute("SELECT activity_id FROM members_info WHERE mem_id = ? AND date_time >="

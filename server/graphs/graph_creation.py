@@ -42,6 +42,8 @@ def create_status_pie_graph(stats_list):
     ax1.axis('equal')
     plt.savefig(GRAPHS_DIRECTORY + '/status_pie_graph.png')
 
+    plt.close()
+
 
 def create_status_bar_graph(stats_list):
     num_of_days = len(stats_list)
@@ -77,10 +79,11 @@ def create_status_bar_graph(stats_list):
     ind = np.arange(num_of_days)  # the x locations for the groups
     width = 0.35  # the width of the bars: can also be len(x) sequence
 
-    p1 = plt.bar(ind, online, width, color='green')
-    p2 = plt.bar(ind, offline, width, bottom=online, color='grey')
-    p3 = plt.bar(ind, idle, width, bottom=np.array(offline)+np.array(online), color='orange')
-    p4 = plt.bar(ind, dnd, width, bottom=np.array(idle)+np.array(offline)+np.array(online), color='red')
+    plt.bar(ind, online, width, color='green', label='Online')
+    plt.bar(ind, offline, width, bottom=online, color='grey', label='Offline')
+    plt.bar(ind, idle, width, bottom=np.array(offline)+np.array(online), color='orange', label='Idle')
+    plt.bar(ind, dnd, width, bottom=np.array(idle)+np.array(offline)+np.array(online), color='red', label='Do Not '
+                                                                                                          'Disturb')
 
     plt.ylabel('Percent')
     plt.title('Statuses by Day and Percentage of Day')
@@ -90,9 +93,11 @@ def create_status_bar_graph(stats_list):
         names_list.append(str(day))
     plt.xticks(ind, names_list)
     plt.yticks(np.arange(0, 101, 10))
-    plt.legend((p1[0], p2[0], p3[0], p4[0]), ('Online', 'Offline', 'Idle', 'Do Not Disturb'))
+    plt.legend()
 
     plt.savefig(GRAPHS_DIRECTORY + '/status_bar_graph.png')
+
+    plt.close()
 
 
 def create_activity_pie_graph(activity_list, activities_names):
@@ -120,3 +125,5 @@ def create_activity_pie_graph(activity_list, activities_names):
     ax1.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=0)
     ax1.axis('equal')
     plt.savefig(GRAPHS_DIRECTORY + 'activity_pie_graph.png')
+
+    plt.close()
