@@ -89,8 +89,8 @@ class InfoSend(commands.Cog):
             else:
                 discord_member = ctx.guild.get_member(int(member))
         else:
-            await ctx.send(f"{ctx.message.author.mention} {member_name} is not currently in your server. If you would "
-                           f"like to check his information please make sure he is a part of your Discord server.")
+            # await ctx.send(f"{ctx.message.author.mention} {member_name} is not currently in your server. If you would "
+            #                f"like to check his information please make sure he is a part of your Discord server.")
             return
         conn = sqlite3.connect(MEMBERS_DATABASE_DIRECTORY)
         c = conn.cursor()
