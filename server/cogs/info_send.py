@@ -46,6 +46,7 @@ class InfoSend(commands.Cog):
         await ctx.send(return_msg)
 
     def member_last_status(self, ctx, status, member):
+        member_name = member.name + '#' + member.discriminator
         statuses = {'online', 'idle', 'dnd', 'do not disturb', 'offline'}
         if status not in statuses:
             return f'`{status}` is not an acceptable parameter, please try any of these for the status parameter: ' \
@@ -81,6 +82,7 @@ class InfoSend(commands.Cog):
                    f'my database.`'
 
     def member_last_activity(self, ctx, activity, member):
+        member_name = member.name + '#' + member.discriminator
         if self.member_security_check(ctx, member):
             if re.search('[a-zA-Z]', str(member)):
                 discord_member = ctx.guild.get_member_named(member)
@@ -109,7 +111,7 @@ class InfoSend(commands.Cog):
 
         c.execute("SELECT * FROM activities")
         activities = c.fetchall()
-        c.execute("SELECT * FROM members_info WHERE mem_id = ? OR mem_id = ?", (member.id,member_name))
+        c.execute("SELECT * FROM members_info WHERE mem_id = ? OR mem_id = ?", (member.id, member_name))
         instances = c.fetchall()
         c.close()
 
@@ -119,10 +121,10 @@ class InfoSend(commands.Cog):
 
         for instance in reversed(instances):
             if instance[3] == activity_id:
-                return f"`{member} was last {activity} at " \
+                return f"`{member_name} was last {activity} at " \
                        f"{datetime.fromtimestamp(instance[1]).strftime('%Y-%m-%d %H:%M:%S')}`"
 
-        return f'`Unfortunately I was not able to find in my database that {member} has ever done {activity}`'
+        return f'`Unfortunately I was not able to find in my database that {member_name} has ever done {activity}`'
 
     @commands.command()
     async def member_last_activity_dict(self, ctx, activity, *, member):
