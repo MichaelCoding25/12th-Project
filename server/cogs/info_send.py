@@ -6,6 +6,7 @@ import server.graphs.graph_creation as gc
 from datetime import datetime
 from server.database.database_sqlite import MEMBERS_DATABASE_DIRECTORY
 from server.graphs.graph_creation import GRAPHS_DIRECTORY
+import re
 
 
 class InfoSend(commands.Cog):
@@ -80,6 +81,15 @@ class InfoSend(commands.Cog):
                    f'my database.`'
 
     def member_last_activity(self, ctx, activity, member):
+        if self.member_security_check(ctx, member):
+            if re.search('[a-zA-Z]', str(member)):
+                discord_member = ctx.guild.get_member_named(member)
+            else:
+                discord_member = ctx.guild.get_member(int(member))
+        else:
+            await ctx.send(f"{ctx.message.author.mention} {member} is not currently in your server. If you would like "
+                           f"to check his information please make sure he is a part of your Discord server.")
+            return
         conn = sqlite3.connect(MEMBERS_DATABASE_DIRECTORY)
         c = conn.cursor()
         c.execute("SELECT act_name FROM activities")
@@ -94,12 +104,12 @@ class InfoSend(commands.Cog):
 
         if not is_found:
             c.close()
-            return f"`Unfortunately I was not able to find the **activity** you are looking for, please try entering " \
-                   f"one of these activities: **{activities_list}**.`"
+            return f"`{ctx.message.author.mention} Unfortunately I was not able to find the **activity** you are " \
+                   f"looking for, please try entering one of these activities: **{activities_list}**.` "
 
         c.execute("SELECT * FROM activities")
         activities = c.fetchall()
-        c.execute("SELECT * FROM members_info WHERE mem_id = ?", (member,))
+        c.execute("SELECT * FROM members_info WHERE mem_id = ? OR mem_id = ?", (member.id,member_name))
         instances = c.fetchall()
         c.close()
 
@@ -156,24 +166,30 @@ class InfoSend(commands.Cog):
         return_embed.add_field(name='Number Of Days:', value=num_of_days)
 
         if self.member_security_check(ctx, member):
+            if re.search('[a-zA-Z]', str(member)):
+                discord_member = ctx.guild.get_member_named(member)
+            else:
+                discord_member = ctx.guild.get_member(int(member))
             if str(stat_type).lower() == 'statuses':
-                return_msg, return_img = self.get_user_statuses(ctx, num_of_days, graph_type, member)
+                return_msg, return_img = self.get_user_statuses(ctx, num_of_days, graph_type, discord_member)
 
             return_embed.description = return_msg
             return_embed.set_image(url=f"attachment://{return_img.filename}")
             await ctx.send(embed=return_embed, file=return_img)
         else:
-            await ctx.send(f"{member} is not currently in your server. If you would like to check his information "
-                           f"please make sure he is a part of your Discord server.")
+            await ctx.send(f"{ctx.message.author.mention} {member} is not currently in your server. If you would like "
+                           f"to check his information please make sure he is a part of your Discord server.")
 
-    def get_user_statuses(self, ctx, num_of_days, graph_type, member):
-
+    def get_user_statuses(self, ctx, num_of_days, graph_type, member: discord.Member):
+        member_name = member.name + '#' + member.discriminator
         if graph_type == 'pie':
             db_conn = sqlite3.connect(MEMBERS_DATABASE_DIRECTORY)
             cursor = db_conn.cursor()
             days_string = f'-{num_of_days} days'
-            cursor.execute("SELECT status_id FROM members_info WHERE mem_id = ? AND date_time >="
-                           " strftime('%s',datetime('now',?))", (member, days_string))
+
+            cursor.execute("SELECT status_id FROM members_info WHERE (mem_id = ? AND date_time >="
+                           "strftime('%s',datetime('now',?))) OR (mem_id = ? AND date_time >=strftime"
+                           "('%s',datetime('now',?)))", (member.id, days_string, member_name, days_string))
             status_ids = cursor.fetchall()
             cursor.execute("SELECT * FROM statuses")
             all_statuses_db = cursor.fetchall()
@@ -188,15 +204,16 @@ class InfoSend(commands.Cog):
             gc.create_status_pie_graph(all_statuses)
 
             return_img = discord.File(f"{GRAPHS_DIRECTORY}/status_pie_graph.png", filename="status_pie_graph.png")
-            return_message = f"Graph of {member}'s statuses from the last {num_of_days}d.\nRequested by" \
+            return_message = f"Graph of {member_name}'s statuses from the last {num_of_days}d.\nRequested by" \
                              f" {ctx.message.author.mention}"
 
         elif graph_type == 'bar':
             db_conn = sqlite3.connect(MEMBERS_DATABASE_DIRECTORY)
             cursor = db_conn.cursor()
             days_string = f'-{num_of_days} days'
-            cursor.execute("SELECT status_id, date_time FROM members_info WHERE mem_id = ? AND date_time >="
-                           " strftime('%s',datetime('now',?))", (member, days_string))
+            cursor.execute("SELECT status_id, date_time FROM members_info WHERE (mem_id = ? AND date_time >="
+                           "strftime('%s',datetime('now',?))) OR (mem_id = ? AND date_time >=strftime"
+                           "('%s',datetime('now',?)))", (member.id, days_string, member_name, days_string))
             statuses = cursor.fetchall()
             cursor.execute("SELECT * FROM statuses")
             all_statuses_db = cursor.fetchall()
@@ -219,20 +236,21 @@ class InfoSend(commands.Cog):
 
             img = open(f"{GRAPHS_DIRECTORY}/status_bar_graph.png", 'rb')
             return_img = discord.File(f"{GRAPHS_DIRECTORY}/status_bar_graph.png", filename="status_bar_graph.png")
-            return_message = f"Graph of {member}'s statuses from the last {num_of_days}d per day.\nRequested by" \
+            return_message = f"Graph of {member_name}'s statuses from the last {num_of_days}d per day.\nRequested by" \
                              f" {ctx.message.author.mention}"
             img.close()
 
         return return_message, return_img
 
-    def get_user_activities(self, ctx, num_of_days, graph_type, member):
-
+    def get_user_activities(self, ctx, num_of_days, graph_type, member: discord.Member):
+        member_name = member.name + '#' + member.discriminator
         if graph_type == "pie":
             db_conn = sqlite3.connect(MEMBERS_DATABASE_DIRECTORY)
             cursor = db_conn.cursor()
             days_string = f'-{num_of_days} days'
-            cursor.execute("SELECT activity_id FROM members_info WHERE mem_id = ? AND date_time >="
-                           " strftime('%s',datetime('now',?))", (member, days_string))
+            cursor.execute("SELECT activity_id FROM members_info WHERE (mem_id = ? AND date_time >="
+                           "strftime('%s',datetime('now',?))) OR (mem_id = ? AND date_time >=strftime"
+                           "('%s',datetime('now',?)))", (member.id, days_string, member_name, days_string))
             activities_ids = cursor.fetchall()
             cursor.execute("SELECT * FROM activities")
             all_activities_db = cursor.fetchall()
@@ -252,16 +270,17 @@ class InfoSend(commands.Cog):
 
             img = open(f"{GRAPHS_DIRECTORY}/activity_pie_graph.png", 'rb')
             return_img = discord.File(img)
-            return_message = f"Graph of {member}'s activities from the last {num_of_days}d.\nRequested by" \
+            return_message = f"Graph of {member_name}'s activities from the last {num_of_days}d.\nRequested by" \
                              f" {ctx.message.author.mention}"
 
-    def member_security_check(self, ctx, member):
-        if not any(c.isalpha() for c in member):
-            return True
-
+    def member_security_check(self, ctx, member: str):
         for mem in ctx.guild.members:
-            if member == str(mem.name + '#' + mem.discriminator):
-                return True
+            if re.search('[a-zA-Z]', member):
+                if member == str(mem.name + '#' + mem.discriminator):
+                    return True
+            else:
+                if member == str(mem.id):
+                    return True
 
         return False
 

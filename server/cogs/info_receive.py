@@ -58,11 +58,11 @@ class InfoReceive(commands.Cog):
             for guild in guilds:
                 for member in guild.members:
                     member_name = f'{member.name}#{member.discriminator}'
-                    new_member = MembersInfo(member_name, member.status, member.activity)
+                    new_member = MembersInfo(member_name, member.id, member.status, member.activity)
                     all_members.append(new_member)
             unique_members = []
             for mem in all_members:
-                if all(map(lambda un_mem: un_mem.member_name != mem.member_name, unique_members)):
+                if all(map(lambda un_mem: un_mem.member_id != mem.member_id, unique_members)):
                     unique_members.append(mem)
 
             # Enter info into database
@@ -99,7 +99,7 @@ class InfoReceive(commands.Cog):
                         activity_id = activity[0]
                         break
 
-                c.execute("INSERT INTO members_info VALUES (?, ?, ?, ?)", (u_mem.member_name, u_mem.now_time, status_id,
+                c.execute("INSERT INTO members_info VALUES (?, ?, ?, ?)", (u_mem.member_id, u_mem.now_time, status_id,
                                                                            activity_id))
                 conn.commit()
             conn.close()
