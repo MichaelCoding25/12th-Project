@@ -185,8 +185,7 @@ class InfoSend(commands.Cog):
 
             gc.create_status_pie_graph(all_statuses)
 
-            img = open(f"{GRAPHS_DIRECTORY}/status_pie_graph.png", 'rb')
-            return_img = discord.File(img)
+            return_img = discord.File(f"{GRAPHS_DIRECTORY}/status_pie_graph.png", filename="status_pie_graph.png")
             return_message = f"Graph of {member}'s statuses from the last {num_of_days}d.\nRequested by" \
                              f" {ctx.message.author.mention}"
 
