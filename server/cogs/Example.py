@@ -4,7 +4,6 @@ from itertools import cycle
 import random
 import os
 
-
 status = cycle(['Status 1', 'Status 2'])
 
 
@@ -27,9 +26,9 @@ class Example(commands.Cog):
     # Events
     # @commands.Cog.listener()
     # async def on_ready(self):
-        # await self.client.change_presence(status=discord.Status.online, activity=discord.Game('with code.'))
-        # self.change_status.start()
-        # print("Bot is ready")
+    # await self.client.change_presence(status=discord.Status.online, activity=discord.Game('with code.'))
+    # self.change_status.start()
+    # print("Bot is ready")
 
     # Commands
     @commands.command()
@@ -47,7 +46,7 @@ class Example(commands.Cog):
 
     # @tasks.loop(seconds=1)
     # async def change_status(self):
-        # await self.client.change_presence(activity=discord.Game(next(status)))
+    # await self.client.change_presence(activity=discord.Game(next(status)))
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
@@ -93,7 +92,7 @@ class Example(commands.Cog):
 
     # Command to clear chat of (X) amount of messages
     @commands.command()
-    async def clear(self,  ctx, amount: int):
+    async def clear(self, ctx, amount: int):
         """
         Deletes 'amount' of lines of conversation in chat the the user wrote the command in
         together with the command request itself.

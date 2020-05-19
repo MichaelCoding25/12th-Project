@@ -11,6 +11,9 @@ from server.database.database_sqlite import *
 
 # The prefix of the commands that the bot uses
 client = commands.Bot(command_prefix='.')
+client.remove_command('help')
+
+HAS_STARTED_DATABASE = False
 
 
 @client.event
@@ -20,12 +23,14 @@ async def on_ready():
     Checks if the databases and tables inside of it exist, and if they don't, calls functions to create them.
     :return:
     """
+    global HAS_STARTED_DATABASE
     print("Bot is ready")
-
-    create_members_info_table()
-    create_activities_table()
-    create_statuses_table()
-    print("Database is ready")
+    if not HAS_STARTED_DATABASE:
+        create_members_info_table()
+        create_activities_table()
+        create_statuses_table()
+        HAS_STARTED_DATABASE = True
+        print("Database is ready")
 
 
 # @client.event
@@ -68,6 +73,55 @@ async def reload(ctx, extension):
     """
     client.unload_extension(f'cogs.{extension}')
     client.load_extension(f'cogs.{extension}')
+
+
+@client.command(pass_context=True)
+async def help(ctx, *cog):
+    """Gets all cogs and commands of mine."""
+    try:
+        if not cog:
+            """Cog listing.  What more?"""
+            halp = discord.Embed(title='Cog Listing and Uncatergorized Commands',
+                                 description='Use `.help *cog*` to find out more about them!\n(BTW, the Cog Name Must '
+                                             'Be in Title Case, Just Like this Sentence.)')
+            cogs_desc = ''
+            for x in client.cogs:
+                cogs_desc += ('{} - {}'.format(x, client.cogs[x].__doc__) + '\n')
+            halp.add_field(name='Cogs', value=cogs_desc[0:len(cogs_desc) - 1], inline=False)
+            cmds_desc = ''
+            for y in client.walk_commands():
+                if not y.cog_name and not y.hidden:
+                    cmds_desc += ('{} - {}'.format(y.name, y.help) + '\n')
+            halp.add_field(name='Uncatergorized Commands', value=cmds_desc[0:len(cmds_desc) - 1], inline=False)
+            await ctx.message.add_reaction(emoji='✉')
+            await ctx.message.author.send('', embed=halp)
+        else:
+            """Helps me remind you if you pass too many args."""
+            if len(cog) > 1:
+                halp = discord.Embed(title='Error!', description='That is way too many cogs!',
+                                     color=discord.Color.red())
+                await ctx.message.author.send('', embed=halp)
+            else:
+                """Command listing within a cog."""
+                found = False
+                for x in client.cogs:
+                    for y in cog:
+                        if x == y:
+                            halp = discord.Embed(title=cog[0] + ' Command Listing',
+                                                 description=client.cogs[cog[0]].__doc__)
+                            for c in client.get_cog(y).get_commands():
+                                if not c.hidden:
+                                    halp.add_field(name=c.name, value=c.help, inline=False)
+                            found = True
+                if not found:
+                    """Reminds you if that cog doesn't exist."""
+                    halp = discord.Embed(title='Error!', description='How do you even use "' + cog[0] + '"?',
+                                         color=discord.Color.red())
+                else:
+                    await ctx.message.add_reaction(emoji='✉')
+                await ctx.message.author.send('', embed=halp)
+    except:
+        await ctx.send("Excuse me, I can't send embeds.")
 
 
 def main(token):

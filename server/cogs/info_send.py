@@ -9,7 +9,7 @@ from server.graphs.graph_creation import GRAPHS_DIRECTORY
 import re
 
 
-class InfoSend(commands.Cog):
+class StatisticCommands(commands.Cog):
     """
     Sends data into the Discord channel chats.
     """
