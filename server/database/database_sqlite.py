@@ -30,6 +30,8 @@ def create_activities_table():
     """
     conn = sqlite3.connect(MEMBERS_DATABASE_DIRECTORY)
     c = conn.cursor()
+    c.execute("""DROP TABLE IF EXISTS activities""")
+    conn.commit()
     c.execute("""CREATE TABLE IF NOT EXISTS activities (
                     id       INTEGER PRIMARY KEY AUTOINCREMENT,
                     act_name TEXT    NOT NULL

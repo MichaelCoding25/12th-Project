@@ -30,23 +30,6 @@ class DataReceive(commands.Cog):
         print("Info_Receive cog is ready")
 
     @tasks.loop(minutes=10)
-    async def get_members_list(self):
-        """
-        Gets all member objects from all servers tha the Bot is in and inputs them into a dictionary
-        of lists with all member info.
-        :return:
-        """
-        guilds = self.client.guilds
-        all_members = []
-        for guild in guilds:
-            for member in guild.members:
-                member_name = f'{member.name}#{member.discriminator}'
-                new_member = MembersInfo(member_name, member.status, member.activity)
-                all_members.append(new_member)
-        for each_member in all_members:
-            self.members_dict.setdefault(each_member.member_name, []).append(each_member)
-
-    @tasks.loop(minutes=10)
     async def get_members_db(self):
         """
         Receives all members from all discord servers that the Bot is in every X time and
