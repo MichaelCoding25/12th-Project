@@ -14,11 +14,6 @@ class MembersInfo:
         self.member_name = f'{member_name}'
         self.member_id = f'{member_id}'
         self.member_status = f'{member_status}'
-        if 'CustomActivity' in f'{type(member_activity)}':
-            self.member_activity = 'Custom Status'
-        elif 'playing' in f'{member_activity}':
-            self.member_activity = 'Playing'
-        else:
-            self.member_activity = f'{member_activity}'
+        self.member_activity = f'{member_activity}'
         self.now = datetime.now()
         self.now_time = int(datetime.timestamp(self.now))

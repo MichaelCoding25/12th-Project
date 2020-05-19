@@ -282,7 +282,7 @@ class StatCommands(commands.Cog):
             all_activities_db = cursor.fetchall()
             db_conn.close()
 
-            day_week_statuses = []
+            day_week_activities = []
             day_in_seconds = 86400
             now = datetime.now()
             now_time = int(datetime.timestamp(now))
@@ -293,9 +293,13 @@ class StatCommands(commands.Cog):
                         for act in all_activities_db:
                             if act[0] == activity[0]:
                                 day_activities.append(act[1])
-                day_week_statuses.append(day_activities)
+                day_week_activities.append(day_activities)
 
-            gc.create_status_bar_graph(day_week_statuses)
+            activities_names = []
+            for activity in all_activities_db:
+                activities_names.append(activity[1])
+
+            gc.create_activity_bar_graph(day_week_activities, activities_names)
 
             img = open(f"{GRAPHS_DIRECTORY}/activity_bar_graph.png", 'rb')
             return_img = discord.File(f"{GRAPHS_DIRECTORY}/activity_bar_graph.png", filename="activity_bar_graph.png")

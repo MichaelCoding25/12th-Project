@@ -112,7 +112,6 @@ def create_activity_pie_graph(activity_list, activities_names):
         for num in range(len(activities_names)):
             if act == activities_names[num]:
                 ind_activity_nums[num] += 1
-                num = len(activities_names)
 
     labels = []
     labels_names = activities_names
@@ -125,6 +124,54 @@ def create_activity_pie_graph(activity_list, activities_names):
     fig1, ax1 = plt.subplots()
     ax1.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=0)
     ax1.axis('equal')
+    plt.legend()
     plt.savefig(GRAPHS_DIRECTORY + '/activity_pie_graph.png')
+
+    plt.clf()
+
+
+def create_activity_bar_graph(activity_list, activities_names):
+    num_of_days = len(activity_list)
+
+    new_activities_list = []
+
+    for act_nam in activities_names:
+        new_activities_list.append([])
+
+    for day in activity_list:
+        day_activities_nums = []
+        for activity_name in activities_names:
+            day_activities_nums.append(0)
+        for act in day:
+            for num in range(len(activities_names)):
+                if act == activities_names[num]:
+                    day_activities_nums[num] += 1
+
+        if len(day) != 0:
+            for activity_num in range(len(activities_names)):
+                new_activities_list[activity_num].append(float(day_activities_nums[activity_num] / len(day) * 100))
+        else:
+            for activity_num in range(len(activities_names)):
+                new_activities_list[activity_num].append(0)
+
+    ind = np.arange(num_of_days)  # the x locations for the groups
+    width = 0.35  # the width of the bars: can also be len(x) sequence
+
+    bottom_list = 0.0
+    for activity_num in range(len(activities_names)):
+        plt.bar(ind, new_activities_list[activity_num], width, bottom=bottom_list, label=activities_names[activity_num])
+        bottom_list += np.array(new_activities_list[activity_num])
+
+    plt.ylabel('Percent')
+    plt.title('Activities by Day and Percentage of Day')
+    plt.xlabel('Days Ago')
+    names_list = []
+    for day in range(num_of_days):
+        names_list.append(str(day))
+    plt.xticks(ind, names_list)
+    plt.yticks(np.arange(0, 101, 10))
+    plt.legend()
+
+    plt.savefig(GRAPHS_DIRECTORY + '/activity_bar_graph.png')
 
     plt.clf()

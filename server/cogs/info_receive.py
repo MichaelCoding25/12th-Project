@@ -3,6 +3,7 @@ from server.database.members_info import MembersInfo
 import sqlite3
 from server.database.database_sqlite import MEMBERS_DATABASE_DIRECTORY
 from datetime import datetime
+import discord
 
 
 class DataReceive(commands.Cog):
@@ -58,7 +59,33 @@ class DataReceive(commands.Cog):
             for guild in guilds:
                 for member in guild.members:
                     member_name = f'{member.name}#{member.discriminator}'
-                    new_member = MembersInfo(member_name, member.id, member.status, member.activity)
+
+                    activities_list = []
+                    for activity in member.activities:
+                        if activity.type is discord.ActivityType.streaming:
+                            activities_list.append("Streaming")
+                        elif activity.type is discord.ActivityType.playing:
+                            activities_list.append("Playing")
+                        elif activity.type is discord.ActivityType.watching:
+                            activities_list.append("Watching")
+                        elif activity.type is discord.ActivityType.listening:
+                            activities_list.append("Listening")
+                        else:
+                            activities_list.append("Nothing")
+
+                    if "Streaming" in activities_list:
+                        current_activity = "Streaming"
+                    elif "Playing" in activities_list:
+                        current_activity = "Playing"
+                    elif "Watching" in activities_list:
+                        current_activity = "Watching"
+                    elif "Listening" in activities_list:
+                        current_activity = "Spotify"
+                    elif "Nothing" in activities_list:
+                        current_activity = "None"
+                    else:
+                        current_activity = "Unknown"
+                    new_member = MembersInfo(member_name, member.id, member.status, current_activity)
                     all_members.append(new_member)
             unique_members = []
             for mem in all_members:

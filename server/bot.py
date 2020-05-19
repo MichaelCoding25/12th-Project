@@ -75,7 +75,7 @@ async def reload(ctx, extension):
     client.load_extension(f'cogs.{extension}')
 
 
-@client.command(pass_context=True)
+@client.command(pass_context=True, aliases=['Help'])
 async def help(ctx, *cog):
     """Gets all cogs and commands of mine."""
     try:
