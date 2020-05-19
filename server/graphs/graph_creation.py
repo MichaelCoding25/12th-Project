@@ -125,6 +125,6 @@ def create_activity_pie_graph(activity_list, activities_names):
     fig1, ax1 = plt.subplots()
     ax1.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=0)
     ax1.axis('equal')
-    plt.savefig(GRAPHS_DIRECTORY + 'activity_pie_graph.png')
+    plt.savefig(GRAPHS_DIRECTORY + '/activity_pie_graph.png')
 
     plt.clf()

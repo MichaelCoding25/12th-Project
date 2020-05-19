@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from server.cogs.info_receive import InfoReceive
+from server.cogs.info_receive import DataReceive
 import sqlite3
 import server.graphs.graph_creation as gc
 from datetime import datetime
@@ -9,9 +9,21 @@ from server.graphs.graph_creation import GRAPHS_DIRECTORY
 import re
 
 
-class StatisticCommands(commands.Cog):
+def member_security_check(ctx, member: str):
+    for mem in ctx.guild.members:
+        if re.search('[a-zA-Z]', member):
+            if member == str(mem.name + '#' + mem.discriminator):
+                return True
+        else:
+            if member == str(mem.id):
+                return True
+
+    return False
+
+
+class StatCommands(commands.Cog):
     """
-    Sends data into the Discord channel chats.
+    User statistics commands.
     """
 
     def __init__(self, client):
@@ -27,14 +39,14 @@ class StatisticCommands(commands.Cog):
         Starts the cog.
         :return:
         """
-        print("Info_Send cog is ready")
+        print("StatCommands cog is ready")
         print('')
 
     @commands.command()
     async def member_last_stat(self, ctx, stat_type, stat_name, *, member):
         return_msg = ''
 
-        if self.member_security_check(ctx, member):
+        if member_security_check(ctx, member):
             if str(stat_type).lower() == 'status':
                 return_msg = self.member_last_status(ctx, stat_name, member)
             elif str(stat_type).lower() == 'activity':
@@ -83,7 +95,7 @@ class StatisticCommands(commands.Cog):
 
     def member_last_activity(self, ctx, activity, member):
         member_name = member.name + '#' + member.discriminator
-        if self.member_security_check(ctx, member):
+        if member_security_check(ctx, member):
             if re.search('[a-zA-Z]', str(member)):
                 discord_member = ctx.guild.get_member_named(member)
             else:
@@ -127,26 +139,6 @@ class StatisticCommands(commands.Cog):
         return f'`Unfortunately I was not able to find in my database that {member_name} has ever done {activity}`'
 
     @commands.command()
-    async def member_last_activity_dict(self, ctx, activity, *, member):
-        """
-        Searches for the last instance of that activity in the db/dictionary and sends back to the chat
-        the time that they had that last activity.
-        :param ctx: What server and channel did the command come from to be able to send it back to the right place.
-        :param activity: What is the activity they want to receive the answer for.
-        :param member: The member for which the command is being issued for.
-        :return: The last time said user was doing that particular activity.
-        """
-        did_find = False
-        for instance in reversed(InfoReceive.members_dict[member]):
-            if instance.member_activity == f'{activity}':
-                await ctx.send(f"`{member}'s activity was {activity} last on {instance.now_datetime} `")
-                did_find = True
-                break
-        if not did_find:
-            await ctx.send(f'I am sorry but it seems that I was not able to find that `{member}` has ever done'
-                           f' the `activity` you wanted to check in my life time.')
-
-    @commands.command()
     async def get_user_stats(self, ctx, stat_type, num_of_days, graph_type, *, member):
         await ctx.message.delete()
         if int(num_of_days) > 20:
@@ -167,13 +159,16 @@ class StatisticCommands(commands.Cog):
         return_embed.add_field(name='Graph Type:', value=graph_type)
         return_embed.add_field(name='Number Of Days:', value=num_of_days)
 
-        if self.member_security_check(ctx, member):
+        if member_security_check(ctx, member):
             if re.search('[a-zA-Z]', str(member)):
                 discord_member = ctx.guild.get_member_named(member)
             else:
                 discord_member = ctx.guild.get_member(int(member))
+
             if str(stat_type).lower() == 'statuses':
                 return_msg, return_img = self.get_user_statuses(ctx, num_of_days, graph_type, discord_member)
+            elif str(stat_type).lower() == 'activities':
+                return_msg, return_img = self.get_user_activities(ctx, num_of_days, graph_type, discord_member)
 
             return_embed.description = return_msg
             return_embed.set_image(url=f"attachment://{return_img.filename}")
@@ -246,45 +241,69 @@ class StatisticCommands(commands.Cog):
 
     def get_user_activities(self, ctx, num_of_days, graph_type, member: discord.Member):
         member_name = member.name + '#' + member.discriminator
-        if graph_type == "pie":
+        if graph_type == 'pie':
             db_conn = sqlite3.connect(MEMBERS_DATABASE_DIRECTORY)
             cursor = db_conn.cursor()
             days_string = f'-{num_of_days} days'
+
             cursor.execute("SELECT activity_id FROM members_info WHERE (mem_id = ? AND date_time >="
                            "strftime('%s',datetime('now',?))) OR (mem_id = ? AND date_time >=strftime"
                            "('%s',datetime('now',?)))", (member.id, days_string, member_name, days_string))
-            activities_ids = cursor.fetchall()
+            activity_ids = cursor.fetchall()
             cursor.execute("SELECT * FROM activities")
             all_activities_db = cursor.fetchall()
             db_conn.close()
 
             all_activities = []
-            for status_id in activities_ids:
-                for stat in all_activities_db:
-                    if stat[0] == status_id[0]:
-                        all_activities.append(stat[1])
+            for activity_id in activity_ids:
+                for act in all_activities_db:
+                    if act[0] == activity_id[0]:
+                        all_activities.append(act[1])
 
-            act_name_list = []
-            for act in all_activities_db:
-                act_name_list.append(act[1])
+            activities_names = []
+            for activity in all_activities_db:
+                activities_names.append(activity[1])
 
-            gc.create_status_pie_graph(all_activities, act_name_list)
+            gc.create_activity_pie_graph(all_activities, activities_names)
 
-            img = open(f"{GRAPHS_DIRECTORY}/activity_pie_graph.png", 'rb')
-            return_img = discord.File(img)
+            return_img = discord.File(f"{GRAPHS_DIRECTORY}/activity_pie_graph.png", filename="activity_pie_graph.png")
             return_message = f"Graph of {member_name}'s activities from the last {num_of_days}d.\nRequested by" \
                              f" {ctx.message.author.mention}"
 
-    def member_security_check(self, ctx, member: str):
-        for mem in ctx.guild.members:
-            if re.search('[a-zA-Z]', member):
-                if member == str(mem.name + '#' + mem.discriminator):
-                    return True
-            else:
-                if member == str(mem.id):
-                    return True
+        elif graph_type == 'bar':
+            db_conn = sqlite3.connect(MEMBERS_DATABASE_DIRECTORY)
+            cursor = db_conn.cursor()
+            days_string = f'-{num_of_days} days'
+            cursor.execute("SELECT activity_id, date_time FROM members_info WHERE (mem_id = ? AND date_time >="
+                           "strftime('%s',datetime('now',?))) OR (mem_id = ? AND date_time >=strftime"
+                           "('%s',datetime('now',?)))", (member.id, days_string, member_name, days_string))
+            activities = cursor.fetchall()
+            cursor.execute("SELECT * FROM activities")
+            all_activities_db = cursor.fetchall()
+            db_conn.close()
 
-        return False
+            day_week_statuses = []
+            day_in_seconds = 86400
+            now = datetime.now()
+            now_time = int(datetime.timestamp(now))
+            for day in range(int(num_of_days)):
+                day_activities = []
+                for activity in activities:
+                    if now_time - (day_in_seconds * (day + 1)) < activity[1] <= now_time - (day_in_seconds * day):
+                        for act in all_activities_db:
+                            if act[0] == activity[0]:
+                                day_activities.append(act[1])
+                day_week_statuses.append(day_activities)
+
+            gc.create_status_bar_graph(day_week_statuses)
+
+            img = open(f"{GRAPHS_DIRECTORY}/activity_bar_graph.png", 'rb')
+            return_img = discord.File(f"{GRAPHS_DIRECTORY}/activity_bar_graph.png", filename="activity_bar_graph.png")
+            return_message = f"Graph of {member_name}'s activities from the last {num_of_days}d per day.\nRequested" \
+                             f" by {ctx.message.author.mention}"
+            img.close()
+
+        return return_message, return_img
 
 
 def setup(client):
@@ -293,4 +312,4 @@ def setup(client):
     :param client:
     :return:
     """
-    client.add_cog(InfoSend(client))
+    client.add_cog(StatCommands(client))

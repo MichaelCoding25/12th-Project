@@ -5,9 +5,9 @@ from server.database.database_sqlite import MEMBERS_DATABASE_DIRECTORY
 from datetime import datetime
 
 
-class InfoReceive(commands.Cog):
+class DataReceive(commands.Cog):
     """
-    Receives info from Discord application
+    Receives data from the Discord application.
     """
 
     def __init__(self, client):
@@ -114,4 +114,4 @@ def setup(client):
     :param client:
     :return:
     """
-    client.add_cog(InfoReceive(client))
+    client.add_cog(DataReceive(client))
