@@ -6,6 +6,9 @@ GRAPHS_DIRECTORY = CD + '/server/graphs'
 
 
 def create_status_pie_graph(stats_list):
+    """
+
+    """
     stats_num = len(stats_list)
 
     ind_stats_nums = [0, 0, 0, 0]

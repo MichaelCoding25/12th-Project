@@ -166,5 +166,6 @@ class Example(commands.Cog):
 
         await ctx.send(embed=embead)
 
-# def setup(client):
-#    client.add_cog(Example(client))
+
+def setup(client):
+    client.add_cog(Example(client))

@@ -43,8 +43,11 @@ class StatCommands(commands.Cog):
         print("StatCommands cog is ready")
         print('')
 
-    @commands.command()
+    @commands.command(pass_context=True)
     async def member_last_stat(self, ctx, stat_type, stat_name, *, member):
+        """
+
+        """
         return_msg = ''
 
         if member_security_check(ctx, member):
@@ -139,9 +142,8 @@ class StatCommands(commands.Cog):
 
         return f'`Unfortunately I was not able to find in my database that {member_name} has ever done {activity}`'
 
-    @commands.command()
-    async def get_user_stats(self, ctx, stat_type, num_of_days, graph_type, *, member):
-        await ctx.message.delete()
+    @commands.command(pass_context=True)
+    async def get_user_stats(self, ctx, stat_type, num_of_days, graph_type, display_public, *, member):
         if int(num_of_days) > 20:
             await ctx.send(f"{ctx.message.author.mention} You may only request data that is 20 days old, or less. "
                            f"Please try again.")
@@ -166,17 +168,32 @@ class StatCommands(commands.Cog):
             else:
                 discord_member = ctx.guild.get_member(int(member))
 
-            if str(stat_type).lower() == 'statuses':
-                return_msg, return_img = self.get_user_statuses(ctx, num_of_days, graph_type, discord_member)
-            elif str(stat_type).lower() == 'activities':
-                return_msg, return_img = self.get_user_activities(ctx, num_of_days, graph_type, discord_member)
+            if str(graph_type).lower() == 'bar' or str(graph_type).lower() == 'pie':
+                if str(stat_type).lower() == 'statuses':
+                    return_msg, return_img = self.get_user_statuses(ctx, num_of_days, graph_type, discord_member)
+                elif str(stat_type).lower() == 'activities':
+                    return_msg, return_img = self.get_user_activities(ctx, num_of_days, graph_type, discord_member)
+                else:
+                    return await ctx.send(f"{ctx.message.author.mention} ```css\n [ERROR] You failed to provide a valid"
+                                          f" parameter for stat_type, try again with one of the following:"
+                                          f" statuses / activities.```")
+            else:
+                return await ctx.send(f"{ctx.message.author.mention} ```css\n [ERROR] You failed to provide a valid "
+                                      f"graph type, try again with one of the following: pie /  bar.```")
 
             return_embed.description = return_msg
             return_embed.set_image(url=f"attachment://{return_img.filename}")
-            await ctx.send(embed=return_embed, file=return_img)
+            if str(display_public).lower() == 'yes':
+                await ctx.send(embed=return_embed, file=return_img)
+            elif str(display_public).lower() == 'no':
+                await ctx.message.author.send(embed=return_embed, file=return_img)
+            else:
+                return await ctx.send(f"{ctx.message.author.mention} ```css\n [ERROR] You failed to provide a valid "
+                               f"parameter for display_public, try again with one of the following: Yes / No.```")
         else:
-            await ctx.send(f"{ctx.message.author.mention} {member} is not currently in your server. If you would like "
-                           f"to check his information please make sure he is a part of your Discord server.")
+            return await ctx.send(f"{ctx.message.author.mention} ```css\n [ERROR] {member} is not currently in "
+                                  f"your server. If you would like to check his information, please make"
+                                  f" sure he is a part of this Discord server.```")
 
     def get_user_statuses(self, ctx, num_of_days, graph_type, member: discord.Member):
         member_name = member.name + '#' + member.discriminator
