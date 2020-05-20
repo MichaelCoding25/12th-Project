@@ -1,16 +1,15 @@
 # Main bot file, starts the bot and everything else from here
+import os
 import sys
 
-import os
-
-from discord.ext import commands
-
 import discord
+from discord.ext import commands
 
 from server.database.database_sqlite import *
 
 # The prefix of the commands that the bot uses
-client = commands.Bot(command_prefix='.')
+BOT_PREFIX = '.'
+client = commands.Bot(command_prefix=BOT_PREFIX)
 client.remove_command('help')
 
 HAS_STARTED_DATABASE = False
@@ -39,51 +38,17 @@ async def on_ready():
 #    print(traceback.format_exc())
 
 
-@client.command()
-async def load(ctx, extension):
-    """
-    Load the cogs.
-    :param ctx:
-    :param extension:
-    :return:
-    """
-    client.load_extension(f'cogs.{extension}')
-
-
-# Command to unload cogs
-@client.command()
-async def unload(ctx, extension):
-    """
-    Unload the cogs.
-    :param ctx:
-    :param extension:
-    :return:
-    """
-    client.unload_extension(f'cogs.{extension}')
-
-
-# Command to reload cogs
-@client.command()
-async def reload(ctx, extension):
-    """
-    Reload all cogs.
-    :param ctx:
-    :param extension:
-    :return:
-    """
-    client.unload_extension(f'cogs.{extension}')
-    client.load_extension(f'cogs.{extension}')
-
-
 @client.command(pass_context=True, aliases=['Help'])
 async def help(ctx, *cog):
     """Gets all cogs and commands of mine."""
+    global halp
+    global BOT_PREFIX
     try:
         if not cog:
             """Cog listing.  What more?"""
             halp = discord.Embed(title='Cog Listing and Uncatergorized Commands',
-                                 description='Use `.help *cog*` to find out more about them!\n(BTW, the Cog Name Must '
-                                             'Be in Title Case, Just Like this Sentence.)')
+                                 description=f'Use `{BOT_PREFIX}help *cog*` to find out more about them!\n(BTW, '
+                                             f'the Cog Name Must Be in Title Case, Just Like this Sentence.)')
             cogs_desc = ''
             for x in client.cogs:
                 cogs_desc += ('{} - {}'.format(x, client.cogs[x].__doc__) + '\n')

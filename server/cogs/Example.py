@@ -1,8 +1,8 @@
+import random
+from itertools import cycle
+
 import discord
 from discord.ext import commands
-from itertools import cycle
-import random
-import os
 
 status = cycle(['Status 1', 'Status 2'])
 
@@ -166,6 +166,5 @@ class Example(commands.Cog):
 
         await ctx.send(embed=embead)
 
-
-def setup(client):
-    client.add_cog(Example(client))
+# def setup(client):
+#    client.add_cog(Example(client))

@@ -106,7 +106,7 @@ def create_activity_pie_graph(activity_list, activities_names):
 
     ind_activity_nums = []
 
-    for activity_name in activities_names:
+    for _ in activities_names:
         ind_activity_nums.append(0)
     for act in activity_list:
         for num in range(len(activities_names)):
@@ -135,12 +135,12 @@ def create_activity_bar_graph(activity_list, activities_names):
 
     new_activities_list = []
 
-    for act_nam in activities_names:
+    for _ in activities_names:
         new_activities_list.append([])
 
     for day in activity_list:
         day_activities_nums = []
-        for activity_name in activities_names:
+        for _ in activities_names:
             day_activities_nums.append(0)
         for act in day:
             for num in range(len(activities_names)):

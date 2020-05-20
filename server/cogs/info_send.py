@@ -1,12 +1,13 @@
+import re
+import sqlite3
+from datetime import datetime
+
 import discord
 from discord.ext import commands
-from server.cogs.info_receive import DataReceive
-import sqlite3
+
 import server.graphs.graph_creation as gc
-from datetime import datetime
 from server.database.database_sqlite import MEMBERS_DATABASE_DIRECTORY
 from server.graphs.graph_creation import GRAPHS_DIRECTORY
-import re
 
 
 def member_security_check(ctx, member: str):
@@ -90,8 +91,8 @@ class StatCommands(commands.Cog):
             return f'`I am sorry but it seems that I was not able to find that `{member}` has ever been on `Do Not ' \
                    f'Disturb` in my database.`'
         else:
-            return f'`I am sorry but it seems that I was not able to find that `{member}` has ever been `{status}` in ' \
-                   f'my database.`'
+            return f'`I am sorry but it seems that I was not able to find that `{member}` has ever been `{status}`' \
+                   f' in my database.` '
 
     def member_last_activity(self, ctx, activity, member):
         member_name = member.name + '#' + member.discriminator
@@ -101,8 +102,8 @@ class StatCommands(commands.Cog):
             else:
                 discord_member = ctx.guild.get_member(int(member))
         else:
-            # await ctx.send(f"{ctx.message.author.mention} {member_name} is not currently in your server. If you would "
-            #                f"like to check his information please make sure he is a part of your Discord server.")
+            # await ctx.send(f"{ctx.message.author.mention} {member_name} is not currently in your server. If you
+            # would like to check his information please make sure he is a part of your Discord server.")
             return
         conn = sqlite3.connect(MEMBERS_DATABASE_DIRECTORY)
         c = conn.cursor()
