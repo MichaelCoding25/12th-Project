@@ -2,9 +2,11 @@
 import os
 
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 
 from server.database.database_sqlite import *
+
+from datetime import datetime
 
 # The prefix of the commands that the bot uses
 BOT_PREFIX = '.'
@@ -23,6 +25,7 @@ async def on_ready():
     """
     global HAS_STARTED_DATABASE
     print("Bot is ready")
+    delete_extra_db_logs.start()
     if not HAS_STARTED_DATABASE:
         create_members_info_table()
         create_activities_table()
@@ -85,6 +88,12 @@ async def help(ctx, *cog):
                 await ctx.message.author.send('', embed=halp)
     except:
         await ctx.send("Excuse me, I can't send embeds.")
+
+
+@tasks.loop(seconds=24)
+async def delete_extra_db_logs():
+    handle_database_overdraft()
+    print(f'Purged Database || {datetime.today().strftime("%b %d %Y %H:%M")}')
 
 
 def launch(token):

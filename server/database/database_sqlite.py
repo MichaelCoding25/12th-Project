@@ -104,3 +104,13 @@ def create_perms_tables():
         print("Was unable to create the role_perms table in the Database.")
     conn.commit()
     conn.close()
+
+
+def handle_database_overdraft():
+    conn = sqlite3.connect()
+    cursor = conn.cursor()
+    days_string = f'-20 days'
+    cursor.execute("DELETE FROM members_info WHERE date_time <"
+                   "strftime('%s',datetime('now',?))", days_string)
+    conn.commit()
+    conn.close()
