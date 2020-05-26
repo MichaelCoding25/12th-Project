@@ -121,7 +121,7 @@ class StatCommands(commands.Cog):
                     f"database, please allow at least a day to pass from when the member joins the server "
                     f"before requesting his stats.```")
             elif reason == 'in_pm':
-                return await ctx.send(f'{ctx.message.author.mention} ```css\n [ERROR] You cannot use an of the'
+                return await ctx.send(f'{ctx.message.author.mention} ```css\n [ERROR] You cannot use any of the'
                                       f' commands for Analitica Bot in PM, try again in a server.```')
             else:
                 return
@@ -309,7 +309,7 @@ class StatCommands(commands.Cog):
                     f"database, please allow at least a day to pass from when the member joins the server "
                     f"before requesting his stats.```")
             elif reason == 'in_pm':
-                return await ctx.send(f'{ctx.message.author.mention} ```css\n [ERROR] You cannot use an of the'
+                return await ctx.send(f'{ctx.message.author.mention} ```css\n [ERROR] You cannot use any of the'
                                       f' commands for Analitica Bot in PM, try again in a server.```')
             else:
                 return
