@@ -23,13 +23,16 @@ def member_security_check(ctx, member: str):
     """
     reason = ''
     is_in_server = False
-    for mem in ctx.guild.members:
-        if re.search('[a-zA-Z]', member):  # If member was requested via name and discriminator
-            if member == str(mem.name + '#' + mem.discriminator):
-                is_in_server = True
-        else:  # If member was requested via discord ID
-            if member == str(mem.id):
-                is_in_server = True
+    try:
+        for mem in ctx.guild.members:
+            if re.search('[a-zA-Z]', member):  # If member was requested via name and discriminator
+                if member == str(mem.name + '#' + mem.discriminator):
+                    is_in_server = True
+            else:  # If member was requested via discord ID
+                if member == str(mem.id):
+                    is_in_server = True
+    except:
+        return False, 'in_pm'
 
     if is_in_server:
         if re.search('[a-zA-Z]', str(member)):
@@ -117,6 +120,9 @@ class StatCommands(commands.Cog):
                     f"{ctx.message.author.mention} ```fix\n [Warning] {member} is not currently in my "
                     f"database, please allow at least a day to pass from when the member joins the server "
                     f"before requesting his stats.```")
+            elif reason == 'in_pm':
+                return await ctx.send(f'{ctx.message.author.mention} ```css \n [ERROR] You cannot use an of the'
+                                      f' commands for Analitica Bot in PM, try again in a server.```')
             else:
                 return
 
