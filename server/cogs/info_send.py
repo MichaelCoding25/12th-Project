@@ -34,9 +34,10 @@ def member_security_check(ctx, member: str):
     if is_in_server:
         if re.search('[a-zA-Z]', str(member)):
             discord_member = ctx.guild.get_member_named(member)
-            member_name = discord_member.name + '#' + discord_member.discriminator
         else:
             discord_member = ctx.guild.get_member(int(member))
+
+        member_name = discord_member.name + '#' + discord_member.discriminator
 
         db_conn = sqlite3.connect(MEMBERS_DATABASE_DIRECTORY)
         cursor = db_conn.cursor()
