@@ -1,9 +1,11 @@
-from discord.ext import commands, tasks
-from server.database.members_info import MembersInfo
 import sqlite3
-from server.database.database_sqlite import MEMBERS_DATABASE_DIRECTORY
 from datetime import datetime
+
 import discord
+from discord.ext import commands, tasks
+
+from server.database.database_sqlite import MEMBERS_DATABASE_DIRECTORY
+from server.database.members_info import MembersInfo
 
 
 class DataReceive(commands.Cog):
@@ -14,10 +16,9 @@ class DataReceive(commands.Cog):
     def __init__(self, client):
         """
         Receives and configures the Discord client for the tasks.
-        :param client:
+        :param client: The bot
         """
         self.client = client
-    members_dict = dict()
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -36,13 +37,13 @@ class DataReceive(commands.Cog):
         :return:
         """
         try:
-            guilds = self.client.guilds
+            guilds = self.client.guilds  # All the servers the bot is currently in.
             all_members = []
             for guild in guilds:
                 for member in guild.members:
                     member_name = f'{member.name}#{member.discriminator}'
 
-                    activities_list = []
+                    activities_list = []  # Makes a list of all activities the user is currently doing.
                     for activity in member.activities:
                         if activity.type is discord.ActivityType.streaming:
                             activities_list.append("Streaming")
@@ -55,6 +56,7 @@ class DataReceive(commands.Cog):
                         else:
                             activities_list.append("Nothing")
 
+                    # Selects the activity by a list of importance.
                     if "Streaming" in activities_list:
                         current_activity = "Streaming"
                     elif "Playing" in activities_list:
@@ -67,9 +69,13 @@ class DataReceive(commands.Cog):
                         current_activity = "None"
                     else:
                         current_activity = "Unknown"
+
+                    # Creates an object for this member.
                     new_member = MembersInfo(member_name, member.id, member.status, current_activity)
                     all_members.append(new_member)
-            unique_members = []
+
+            unique_members = []  # Only inputs into the database logs of unique members as to not input the same
+            # member twice in the same log.
             for mem in all_members:
                 if all(map(lambda un_mem: un_mem.member_id != mem.member_id, unique_members)):
                     unique_members.append(mem)
@@ -114,6 +120,7 @@ class DataReceive(commands.Cog):
             conn.close()
             print(f'get_member_db completed || {datetime.today().strftime("%b %d %Y %H:%M")}')
         except Exception as e:
+            print(f'get_member_db failed || {datetime.today().strftime("%b %d %Y %H:%M")}')
             print(str(e))
 
 

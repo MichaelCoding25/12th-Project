@@ -63,6 +63,11 @@ class Errors(commands.Cog):
 
     @StatCommands.get_user_stats.error
     async def get_user_stats_handler(self, ctx, error):
+        """
+        The error handler for the get_user_stats command
+        :param ctx: From what location in discord was the error raised.
+        :param error: The discord error that was raised.
+        """
         author = ctx.message.author.mention
         if isinstance(error, commands.MissingRequiredArgument):
             if error.param.name == 'stat_type':
@@ -72,27 +77,75 @@ class Errors(commands.Cog):
                 await ctx.send(f"{author} ```css\n [ERROR] You forgot to provide the number of days that you would "
                                f"like to see the statistics for. ```")
             elif error.param.name == 'graph_type':
-                await ctx.send(f"{author} You forgot to provide the graph type you would like the statistics to be "
-                               f"shown by.")
+                await ctx.send(f"{author} ```css\n [ERROR] You forgot to provide the graph type you would like the "
+                               f"statistics to be shown by.```")
             elif error.param.name == 'display_public':
-                await ctx.send(f"{author} You forgot to provide a statement of Yes or No, if you want the statistics "
-                               f"shown publicly.")
+                await ctx.send(f"{author} ```css\n [ERROR] You forgot to provide a statement of Yes or No, if you "
+                               f"want the statistics shown publicly.```")
             elif error.param.name == 'member':
-                await ctx.send(f"{author} ```css\n [ERROR] You Forgot to provide the member that you would like to "
+                await ctx.send(f"{author} ```css\n [ERROR] You forgot to provide the member that you would like to "
                                f"check the statistics of. ```")
             else:
-                await ctx.send(f"{author} You forgot to enter one of the parameters for the {ctx.command} command.")
+                await ctx.send(f"{author} ```css\n [ERROR] You forgot to enter one of the parameters for the"
+                               f" {ctx.command} command.```")
         elif isinstance(error, commands.BadArgument):
             if error.param.name == 'stat_type':
                 await ctx.send(
-                    f"{author} You failed to provide a valid stat type, try again with one of the following: "
-                    f"*statuses, activities*")
+                    f"{author} ```css\n [ERROR] You failed to provide a valid stat type, try again with one of the "
+                    f"following: statuses, activities```")
             elif error.param.name == 'num_of_days':
-                await ctx.send(f"{author} You failed to provide a valid number of days, try again with a number "
-                               f"between 1 and 20.")
+                await ctx.send(f"{author} ```css\n You failed to provide a valid number of days, try again with a "
+                               f"number between 1 and 20.```")
             elif error.param.name == 'graph_type':
-                await ctx.send(f"{author} You failed to provide a valid graph type, try again with one of the "
-                               f"following: *pie, bar*")
+                await ctx.send(f"{author} ```css\n [ERROR] You failed to provide a valid graph type, try again with "
+                               f"one of the following: *pie, bar*.```")
+            elif error.param.name == 'display_public':
+                await ctx.send(f"{author} ```css\n [ERROR] You failed to provide a valid argument for display_public, "
+                               f"try again with either: yes or no.```")
+            elif error.param.name == 'member':
+                await ctx.send(f"{author} ```css\n [ERROR] You failed to provide a valid member, please try again "
+                               f"with either the member's *discord id* or their *name and discriminator*. Eg: "
+                               f"Example#0000.```")
+        print(f'{error} was raised for {ctx.command}, at {datetime.today().strftime("%b %d %Y %H:%M")}')
+
+    @StatCommands.get_user_last_stat.error
+    async def get_user_last_stat_handler(self, ctx, error):
+        """
+        The error handler for the get_user_last_stat command
+        :param ctx: From what location in discord was the error raised.
+        :param error: The discord error that was raised.
+        """
+        author = ctx.message.author.mention
+        if isinstance(error, commands.MissingRequiredArgument):
+            if error.param.name == 'stat_type':
+                await ctx.send(f"{author} ```css\n [ERROR] You Forgot to provide the statistic type you would like "
+                               f"sent. ```")
+            elif error.param.name == 'stat_name':
+                await ctx.send(f"{author} ```css\n [ERROR] You forgot to provide the statistic name that you are "
+                               f"searching for. ```")
+            elif error.param.name == 'display_public':
+                await ctx.send(f"{author} ```css\n [ERROR] You forgot to provide a statement of Yes or No, if you "
+                               f"want the statistics shown publicly.```")
+            elif error.param.name == 'member':
+                await ctx.send(f"{author} ```css\n [ERROR] You Forgot to provide the member that you would like to "
+                               f"check the statistic of. ```")
+            else:
+                await ctx.send(f"{author} ```css\n [ERROR] You forgot to enter one of the parameters for the"
+                               f" {ctx.command} command.```")
+        elif isinstance(error, commands.BadArgument):
+            if error.param.name == 'stat_type':
+                await ctx.send(
+                    f"{author} ```css\n [ERROR] You failed to provide a valid stat type, try again with one of the "
+                    f"following: status, activity.```")
+            elif error.param.name == 'stat_name':
+                await ctx.send(f"{author} ```css\n [ERROR] You failed to provide a valid stat type, try again. ```")
+            elif error.param.name == 'display_public':
+                await ctx.send(f"{author} ```css\n [ERROR] You failed to provide a valid argument for display_public, "
+                               f"try again with either: yes or no.```")
+            elif error.param.name == 'member':
+                await ctx.send(f"{author} ```css\n [ERROR] You failed to provide a valid member, please try again "
+                               f"with either the member's discord id or their name and discriminator. Eg: "
+                               f"Example#0000.```")
         print(f'{error} was raised for {ctx.command}, at {datetime.today().strftime("%b %d %Y %H:%M")}')
 
 

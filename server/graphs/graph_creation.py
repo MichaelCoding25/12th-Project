@@ -1,5 +1,7 @@
-import numpy as np
+# Handles graph creation
 import matplotlib.pyplot as plt
+import numpy as np
+
 from start import CURRENT_DIR as CD
 
 GRAPHS_DIRECTORY = CD + '/server/graphs'
@@ -7,7 +9,9 @@ GRAPHS_DIRECTORY = CD + '/server/graphs'
 
 def create_status_pie_graph(stats_list):
     """
-
+    Creates a pie graph for discord statuses.
+    :param stats_list: A list  containing the number of times each status was logged.
+    :type stats_list: list
     """
     stats_num = len(stats_list)
 
@@ -50,6 +54,11 @@ def create_status_pie_graph(stats_list):
 
 
 def create_status_bar_graph(stats_list):
+    """
+    Creates a bar graph for discord statuses.
+    :param stats_list: A list  containing the number of times each status was logged, per day.
+    :type stats_list: list
+    """
     num_of_days = len(stats_list)
 
     online = []
@@ -105,6 +114,13 @@ def create_status_bar_graph(stats_list):
 
 
 def create_activity_pie_graph(activity_list, activities_names):
+    """
+    Creates a pie graph for discord activities.
+    :param activity_list: A list containing the number of times each activity was logged.
+    :type activity_list: list
+    :param activities_names: A list containing the names of all the activities.
+    :type activities_names: list
+    """
     activity_num = len(activity_list)
 
     ind_activity_nums = []
@@ -134,6 +150,13 @@ def create_activity_pie_graph(activity_list, activities_names):
 
 
 def create_activity_bar_graph(activity_list, activities_names):
+    """
+    Creates a bar graph for discord activities.
+    :param activity_list: A list  containing the number of times each activity was logged, per day.
+    :type activity_list: list
+    :param activities_names: A list containing the names of all the activities.
+    :type activities_names: list
+    """
     num_of_days = len(activity_list)
 
     new_activities_list = []

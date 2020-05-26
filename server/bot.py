@@ -1,6 +1,5 @@
 # Main bot file, starts the bot and everything else from here
 import os
-import sys
 
 import discord
 from discord.ext import commands
@@ -28,24 +27,23 @@ async def on_ready():
         create_members_info_table()
         create_activities_table()
         create_statuses_table()
+        # create_perms_tables() 'It is not being used yet so it is not being created.'
         HAS_STARTED_DATABASE = True
         print("Database is ready")
 
 
-# @client.event
-# async def on_error(event, *args, **kwargs):
-#    message = args[0]
-#    print(traceback.format_exc())
-
-
-@client.command(pass_context=True, aliases=['Help'])
+@client.command(pass_context=True, aliases=['Help', 'HELP'])
 async def help(ctx, *cog):
-    """Gets all cogs and commands of mine."""
+    """
+    Help command: gathers all cogs and commands that the bot has and sends them via Private Message to the user using
+    the help command.
+    :param ctx: Context
+    """
     global halp
     global BOT_PREFIX
     try:
         if not cog:
-            """Cog listing.  What more?"""
+            """Cog listing."""
             halp = discord.Embed(title='Cog Listing and Uncatergorized Commands',
                                  description=f'Use `{BOT_PREFIX}help *cog*` to find out more about them!\n(BTW, '
                                              f'the Cog Name Must Be in Title Case, Just Like this Sentence.)')
@@ -89,19 +87,22 @@ async def help(ctx, *cog):
         await ctx.send("Excuse me, I can't send embeds.")
 
 
-def main(token):
+def launch(token):
+    """
+    Loads all of the cogs and starts the bot with the discord application.
+    :param token: The token provided by Discord Application in order to authenticate the bot
+     (Required in order to connect the bot to the Discord servers).
+    """
     # Load all the cogs from the files in the cogs folder on startup of bot.
     for filename in os.listdir('./server/cogs'):
         if filename.endswith('.py'):
-            client.load_extension(f'server.cogs.{filename[:-3]}')
+            try:
+                client.load_extension(f'server.cogs.{filename[:-3]}')
+            except:
+                print(f"Was unable to load {filename} cog")
 
-    # The token provided by Discord Application in order to authenticate the bot (Required in order to connect the bot
-    # to the Discord servers).
+    # Attempt to start the bot.
     try:
         client.run(token)
     except discord.errors.LoginFailure:
         print("You have entered an improper token.")
-
-
-if __name__ == '__main__':
-    main(sys.argv[1])
