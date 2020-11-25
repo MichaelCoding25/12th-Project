@@ -1,4 +1,4 @@
-# -------*WIP*-------
+# -------*COMPLETED and received 100 grade*------------
 
 # Analitica Discord Bot
 Year 12 Project for Ort Shapira High School for Michael Spector.
